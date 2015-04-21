@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>QuickVec C++ - A Modern C++ SIMD Library</title>
+
+  <!-- CSS  -->
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body class="blue-grey lighten-3">
+  <nav class="blue-grey lighten-1" role="navigation">
+    <div class="container">
+      <div class="nav-wrapper"><a id="logo-container" href="#" class="brand-logo">QuickVec C++</a>
+        <ul id="nav-mobile" class="right side-nav">
+          <li><a href="#Summary">Summary</a></li>
+          <li><a href="#Background">Background</a></li>
+          <li><a href="#Challenge">Challenge</a></li>
+          <li><a href="#Resources">Resources</a></li>
+          <li><a href="#Goals">Goals</a></li>
+          <li><a href="#Why">Why cross-platform C++?</a></li>
+          <li><a href="#Schedule">Schedule</a></li>
+        </ul><a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+      </div>
+    </div>
+  </nav>
+
+  <div id="index-banner" class="parallax-container">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <br><br>
+        <h1 class="header center teal-text text-lighten-2">QuickVec C++</h1>
+        <div class="row center">
+          <h5 class="header col s12 light">A modern C++ approach to explicit SIMD vectorization.</h5>
+        </div>
+        <div class="row center">
+          <a href="#" id="download-button" class="btn-large disabled">Download</a>
+        </div>
+        <br><br>
+      </div>
+    </div>
+    <div class="parallax"><img src="mandelbrot2.jpg" alt="Unsplashed background img 2" style="-webkit-filter: brightness(40%)"></div>
+  </div>
+
+  <div class="container" id="Summary">
+    <div class="section">
+      <div class="row">
+        <div class="col offset-l3 l6 s12 center">
+          <h4>Summary</h4>
+          <p class="left-align light">QuickVec C++ will be a modern C++ approach to explicit cross-platform SIMD vectorization. It will enable developers access to the power of the hardware SIMD feature sets using a common set of features.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Parallax divider
+  <div class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <div class="row center">
+          <h5 class="header col s12 light"></h5>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="stars1.jpg" alt="Unsplashed background img 3"></div>
+  </div>  -->
+  
+  <div class="blue-grey lighten-2">
+  <div class="container" id="Background">
+    <div class="section">
+      <div class="row">
+        <div class="col s12">
+          <h3 class="center">Background</h3>
+        </div>
+      </div>
+      <!--   Icon Section   -->
+      <div class="row">
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><i class="mdi-image-flash-on"></i></h2>
+            <h5 class="center">Speed</h5>
+            <p class="light">Efficiency and performance are important to many high performance applications. QuickVec C++ will be implemented with a focus on performance and efficiency. It will expose the power of the SIMD instructions available on the hardware on each system without forcing the user to duplicate any work.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><i class="mdi-social-group"></i></h2>
+            <h5 class="center">Familiar Development</h5>
+            <p class="light">It is important to developers to work with well designed systems that follow the paradigms that they know and understand. The QuickVec C++ library will attempt to match the patterns presented by the C++ standard library and STL. This will ease the development process greatly.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text">
+              <i class="mdi-hardware-desktop-windows"></i>
+              <i class="mdi-action-android"></i>
+              <i class="mdi-hardware-smartphone"></i>
+              <i class="mdi-hardware-laptop"></i>
+            </h2>
+            <h5 class="center">Cross-Platform</h5>
+            <p class="light">When developing applications for multiple platforms, it not only inconvenient for developers to use multiple SIMD intrinsic sets, but also inefficient and time-consuming. The QuickVec C++ library will maintain its performance while being fully cross-platform. This means that functions written using the library should run on any of the supported platforms with no extra effort expended.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  
+  <!-- Parallax divider -->
+  <div class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <div class="row center">
+          <h5 class="header col s12 light"></h5>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="fractals1.jpg" alt="Unsplashed background img 3" style="-webkit-filter: brightness(40%)"></div>
+  </div>
+  
+  <div class="container" id="Challenge">
+    <div class="section">
+      <div class="row">
+        <div class="col offset-l3 l6 s12 center">
+          <h4>Challenge</h4>
+          <p class="left-align light">The major challenge of this project is bringing all of the targets together in one library. The target instruction sets include SSE (versions 1-5), AVX (1,2, and 512-bit), and ARM Neon. The challenge for this project is that there are many differing sets of intrinsics for different instruction feature sets and platforms. A large part of the challenge will be determining which features are available for a processor at runtime and executing with little to no overhead in comparison to a sequential implementation if the SIMD operations are not available. The second challenge is getting results with little to no difference in speed with a similarly written SIMD intrinsics implementation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Parallax divider
+  <div class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <div class="row center">
+          <h5 class="header col s12 light"></h5>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="stars2.jpg" alt="Unsplashed background img 2" style="-webkit-filter: brightness(40%)"></div>
+  </div> -->
+  
+  <div class="blue-grey lighten-2">
+  <div class="container" id="Resources">
+    <div class="section">
+      <div class="row">
+        <div class="col offset-l3 l6 s12 center">
+          <h4>Resources</h4>
+          <p class="left-align light">I will be starting from a blank code base. For references I will be using the intrinsic documents and reference guides for SSE and AVX intrinsics found <a href="https://software.intel.com/sites/landingpage/IntrinsicsGuide/">here</a>, and ARM Neon intrinsics found <a href="https://msdn.microsoft.com/en-us/library/hh875058.aspx">here</a></p></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!--
+  <div class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <div class="row center">
+          <h5 class="header col s12 light"></h5>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="fractals2.png" alt="Unsplashed background img 2" style="-webkit-filter: brightness(40%)"></div>
+  </div> -->
+  
+  <div class="container" id="Goals">
+    <div class="section">
+      <div class="row">
+        <div class="col offset-l2 l8 s12 center">
+          <h4>Goals</h4>
+          <div class="left-align light">
+            <ul class="collapsible" data-collapsible="accordion">
+              <li>
+                <div class="collapsible-header active blue-grey">
+                  <i class="mdi-content-add-box"></i>
+                  Find and Implement Commonalities
+                </div>
+                <div class="collapsible-body">
+                  <p>I plan to look through the different intrinsic functions from the different sets and find commonalities. From there I plan to bundle as much as possible together using templates and template-specialization. This will allow the user to specify arguments such as the type (float or int), precision, and number of elements in a vector, and the template instantiate that from whatever is available from the compiled feature set.</p>
+                </div>
+              </li>
+              <li>
+                <div class="collapsible-header active blue-grey">
+                  <i class="mdi-content-add-box"></i>
+                  Match performance.
+                </div>
+                <div class="collapsible-body">
+                  <p>This is in reference to firstly the sequential version of algorithms. By this I mean that when using sequential implementations due to SIMD features not being available the library will introduce only minimal overhead. Secondly, this is in reference to other libraries similar to this one, such as Yeppp!, which is a C library for cross-platform SIMD utilization. Lastly, this is relative to using the platforms intrinsics directly. This means that overhead for using SIMD via this library will be minimal.</p>
+                </div>
+              </li>
+              <li>
+                <div class="collapsible-header active blue-grey">
+                  <i class="mdi-content-add-box"></i>
+                  Use modern C++ Style
+                </div>
+                <div class="collapsible-body">
+                  <p>By this I mean that I will follow the interface style of the STL libraries and Boost. This includes making sure that move and value semantics are maintained for all types. This includes making vectors capable of range for loops.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <div class="row center">
+          <h5 class="header col s12 light"></h5>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="fractals1.jpg" alt="Unsplashed background img 2" style="-webkit-filter: brightness(40%)"></div>
+  </div>
+  
+  <div class="container" id="Why">
+    <div class="section">
+      <div class="row">
+        <div class="col offset-l3 l6 s12 center">
+          <h4>Why use cross-platform C++?</h4>
+          <p class="left-align light">C++ is the current standard language for high-performance cross-platform application development. It is also capable of achieving different levels of abstraction that are not available in other languages. Also, base intrinsics are available onall of the target platforms in C or C++ as a base for implementations.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!--
+  <div class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <div class="row center">
+          <h5 class="header col s12 light"></h5>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="mandelbrot1.png" alt="Unsplashed background img 2" style="-webkit-filter: brightness(40%)"></div>
+  </div> -->
+  
+  <div class="blue-grey lighten-2">
+  <div class="container" id="Schedule">
+    <div class="section">
+      <div class="row">
+        <div class="col offset-l3 l6 s12 center">
+          <h4>Schedule</h4>
+          <table class="hoverable">
+            <thead>
+              <tr>
+                  <th data-field="id">Week</th>
+                  <th data-field="name" class="right-align">Task</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>April 3 - April 10</td>
+                <td class="right-align">Find Commonalities and Design Interfaces</td>
+              </tr>
+              <tr>
+                <td>April 10 - April 17</td>
+                <td class="right-align">Implement sequential and SSE4</td>
+              </tr>
+              <tr>
+                <td>April 17 - April 24</td>
+                <td class="right-align">Implement other SSE versions, AVX, and Neon</td>
+              </tr>
+              <tr>
+                <td>April 24 - May 1</td>
+                <td class="right-align">Implement automatic detection of extensions.</td>
+              </tr>
+              <tr>
+                <td>May 1 - May 8</td>
+                <td class="right-align">Add iterators and other helpers.</td>
+              </tr>
+              <tr>
+                <td>May 8 - May 11</td>
+                <td class="right-align">Prepare for final presentation.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  
+  <!-- <div class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <div class="row center">
+          <h5 class="header col s12 light"></h5>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="fractals1.jpg" alt="Unsplashed background img 2" style="-webkit-filter: brightness(40%)"></div>
+  </div> -->
+
+  <footer class="page-footer teal">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">Personal Bio</h5>
+          <p class="grey-text text-lighten-4">I am a student developing this project for the Carnegie Mellon University School of Computer Science class 15-418 Parallel Computer Architecture and Programming.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+      Made by Matthew Kellogg using <a class="brown-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+      </div>
+    </div>
+  </footer>
+
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+  <script>
+    $(document).ready(function(){
+      $('.collapsible').collapsible({
+        accordion : false // A setting that changes the collapsible behavior to  expandable instead of the default accordion style
+      });
+    });
+  </script>
+  </body>
+</html>
