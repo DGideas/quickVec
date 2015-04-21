@@ -1,0 +1,10 @@
+Debug/
+Release/
+ipch/
+*/ipch
+*.user
+*.sdf
+*.suo
+*.exe
+*.obj
+*.opensd
