@@ -26,8 +26,9 @@ namespace QuickVec {
 		template <>
 		struct modulus<float> {
 			using T = float;
+			//Always positive
 			T operator()(const T& a, const T& b) const {
-				return fmod(a, b);
+				return (a >= 0.0) ? fmod(a, b) : b + fmod(a, b);
 			}
 		};
 

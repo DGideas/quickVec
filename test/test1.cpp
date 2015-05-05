@@ -106,39 +106,51 @@ namespace QuickVecTest
 
 		TEST_METHOD(TestConstruct1)
 		{
-			testConstruct<float_sse>();
+			testConstruct<float4_sse>();
 		}
 
 		TEST_METHOD(TestArithmetic1)
 		{
-			testOp<float_sse, std::plus>();
-			testOp<float_sse, std::minus>();
-			testOp<float_sse, std::multiplies>();
-			testOp<float_sse, std::divides>();
-			testOp<float_sse, func::modulus>();
-			testOp<float_sse, func::bit_or>();
-			testOp<float_sse, func::bit_and>();
-			testOp<float_sse, func::bit_xor>();
+			testOp<float4_sse, std::plus>();
+			testOp<float4_sse, std::minus>();
+			testOp<float4_sse, std::multiplies>();
+			testOp<float4_sse, std::divides>();
+			testOp<float4_sse, func::modulus>();
+			testOp<float4_sse, func::bit_or>();
+			testOp<float4_sse, func::bit_and>();
+			testOp<float4_sse, func::bit_xor>();
 		}
 
 		template < typename A, typename B> 
 		void testSSEDestOp(A op, B opDest) {
-			float_sse f1(1.0f, 2.0f, 3.0f, 4.0f);
-			float_sse f2(2.0f, 3.0f, 4.0f, 5.0f);
-			float_sse f3 = op(f1, f2);
+			float4_sse f1(1.0f, -2.0f, 3.0f, 4.0f);
+			float4_sse f2(2.0f, 3.0f, -4.0f, -5.0f);
+			float4_sse f3 = op(f1, f2);
 			opDest(f1, f2);
 			for (int i = 0; i < 4; i++) {
 				Assert::AreEqual(f1[i], f3[i]);
 			}
 		}
 
-		TEST_METHOD(TestDestructiveArithmetic)
+		TEST_METHOD(TestDestructiveArithmeticSSE)
 		{
-			using fp = float_sse;
-			TestDestOp<fp>::test(std::plus<fp>(), [](float_sse& a, float_sse& b) { a += b; });
-			TestDestOp<fp>::test(std::minus<fp>(), [](float_sse& a, float_sse& b) { a -= b; });
-			TestDestOp<fp>::test(std::multiplies<fp>(), [](float_sse& a, float_sse& b) { a *= b; });
-			TestDestOp<fp>::test(std::divides<fp>(), [](float_sse& a, float_sse& b) { a /= b; });
+			using fp = float4_sse;
+			TestDestOp<fp>::test(std::plus<fp>(), [](float4_sse& a, float4_sse& b) { a += b; });
+			TestDestOp<fp>::test(std::minus<fp>(), [](float4_sse& a, float4_sse& b) { a -= b; });
+			TestDestOp<fp>::test(std::multiplies<fp>(), [](float4_sse& a, float4_sse& b) { a *= b; });
+			TestDestOp<fp>::test(std::divides<fp>(), [](float4_sse& a, float4_sse& b) { a /= b; });
+		}
+
+		TEST_METHOD(TestModuloSSE2) {
+			using fp = float4_sse2;
+			testOp<fp, func::modulus>();
+			TestDestOp<fp>::test(func::modulus<fp>(), [](fp& a, fp& b) {a %= b;});
+		}
+
+		TEST_METHOD(TestModuleSSE4_1) {
+			using fp = float4_sse4_1;
+			testOp<fp, func::modulus>();
+			TestDestOp<fp>::test(func::modulus<fp>(), [](fp& a, fp& b) {a %= b;});
 		}
 	};
 }
