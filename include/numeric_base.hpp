@@ -4,7 +4,6 @@
 
 #include <array>
 #include <iostream>
-#include "array_accessor.hpp"
 
 namespace QuickVec {
 
@@ -29,7 +28,43 @@ namespace QuickVec {
 		}
 	};
 
+	// Forward declaration
 	template<size_t N, typename T, typename Data_t = typename std::array<T, N>, typename DataAccessor = array_accessor<T, N>>
+	class numeric_base;
+
+	template<size_t N, typename Data_t = std::array<bool, N>, typename DataAccessor = array_accessor<bool, N>>
+	class bool_base {
+		using this_t = bool_base<N, Data_t, DataAccessor>;
+		using T = bool;
+		using DA = DataAccessor;
+		Data_t data;
+
+		template<size_t N_, typename T_, typename Data_t_, typename DA_>
+		friend class numeric_base;
+	public:
+		this_t() {}
+
+		template <typename... Args, typename Enable = std::enable_if<sizeof...(Args) == N - 1>::type>
+		this_t(T&& t, Args&&... args) :data({ t, static_cast<T>(args)... }) {};
+
+		template <typename Enable = std::enable_if<(N>1)>::type>
+		this_t(T&& t) {
+			for (size_t i = 0; i < N; i++) {
+				DA::get(data, i) = t;
+			}
+		}
+
+		this_t(Data_t&& d) : data(std::forward<Data_t>(d)) {};
+
+		bool all() const {
+			for (int i = 0; i < N; i++) {
+				if (!DA::get(data, i)) return false;
+			}
+			return true;
+		}
+	};
+
+	template<size_t N, typename T, typename Data_t/* = typename std::array<T, N>*/, typename DataAccessor/* = array_accessor<T, N>*/>
 	class numeric_base {
 		using this_t = numeric_base<N, T, Data_t, DataAccessor>;
 		using DA = DataAccessor;
@@ -40,23 +75,21 @@ namespace QuickVec {
 	public:
 		Data_t data;
 		static const size_t Size = N;
+		using bool_t = bool_base<4>;
 
-		numeric_base() {}
+		this_t() {}
 
 		template <typename... Args, typename Enable = std::enable_if<sizeof...(Args) == N-1>::type>
-		numeric_base(T&& t, Args&&... args) :data({t, static_cast<T>(args)... }) {};
+		this_t(T&& t, Args&&... args) :data({t, static_cast<T>(args)... }) {};
 
 		template <typename Enable = std::enable_if<(N>1)>::type>
-		numeric_base(T&& t) {
+		this_t(T&& t) {
 			for (size_t i = 0; i < N; i++) {
 				DA::get(data, i) = t;
 			}
 		}
 
-		template <typename... Args, typename Enable = std::enable_if<sizeof...(Args) == N - 1>::type>
-		numeric_base(const T& t, const Args&... args) :data({ t, static_cast<T>(args)... }) {};
-
-		numeric_base(Data_t&& d) : data(std::forward<Data_t>(d)) {};
+		this_t(Data_t&& d) : data(std::forward<Data_t>(d)) {};
 
 		//Destructive binary ops
 		//+= -= *= /= %= |= &= ^= >>= <<=
@@ -189,6 +222,32 @@ namespace QuickVec {
 
 		//Comparisons
 		//== != < <= > >=
+		template<typename BinOp, size_t... I>
+		bool_t doCompImpl(const this_t& o, BinOp op, std::index_sequence<I...>) const {
+			bool_t ret;
+			bool _[] = { (bool_t::DA::get(ret.data, I) = op( DA::get(data,I), DA::get(o.data,I)))... };
+			return ret;
+		}
+
+		template<typename BinOp, typename Indices = std::make_index_sequence<N>>
+		bool_t doComp(const this_t& o, BinOp op) const {
+			return doCompImpl(o, op, Indices());
+		}
+
+		template<typename BinOp, size_t... I>
+		bool_t doCompImpl(const T& o, BinOp op, std::index_sequence<I...>) const {
+			bool_t ret;
+			bool _[] = { (bool_t::DA::get(ret.data, I) = op(DA::get(data,I),o))... };
+			return ret;
+		}
+
+		template<typename BinOp, typename Indices = std::make_index_sequence<N>>
+		bool_t doComp(const T& o, BinOp op) const {
+			return doCompImpl(o, op, Indices());
+		}
+
+		bool_t operator<(const this_t& o) const { return doComp(o, [](const T& a, const T& b) { return a < b;}); }
+		bool_t operator<(const T& o) const { return doComp(o, [](const T& a, const T& b) { return a < b;}); }
 
 		//[]
 		T& operator[](size_t i) { return DA::get(data, i); }

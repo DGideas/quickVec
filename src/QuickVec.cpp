@@ -112,6 +112,61 @@ int _tmain(int argc, _TCHAR* argv[])
 		std::cout << "Result is " << v << "\n";
 	}
 
+	{
+		auto start = clock::now();
+		static const uint32_t RESOLUTION = 1024*4;
+		static const uint32_t ITERATIONS = 10;
+		bool* vals= new bool[RESOLUTION*RESOLUTION];
+		for (int iy = 0; iy < RESOLUTION; iy++) {
+			for (int ix = 0; ix < RESOLUTION; ix++) {
+				float x = static_cast<float>(ix) / RESOLUTION;
+				float y = static_cast<float>(iy) / RESOLUTION;
+				float z = 0.0f;
+				float zi = 0.0f;
+				for (int i = 0; i < ITERATIONS; i++) {
+					if (((z*z) + (zi*zi)) < 4.0f) {
+						break;
+					}
+					z = z*z + zi*zi + x;
+					zi = 2.0f*z*zi + y;
+				}
+				if (((z*z) + (zi*zi))>4.0f)
+					vals[ix + iy*RESOLUTION] = true;
+				else
+					vals[ix + iy*RESOLUTION] = false;
+			}
+		}
+		auto end = clock::now();
+		time_diff duration = end - start;
+		std::cout << "Mandelbrot took " << duration.count() << "s\n";
+		delete[] vals;
+	}
+
+	{
+		auto start = clock::now();
+		uint32_t RESOLUTION = 1024 * 4;
+		uint32_t ITERATIONS = 10;
+		bool* vals = new bool[RESOLUTION*RESOLUTION];
+		for (int iy = 0; iy < RESOLUTION; iy++) {
+			QuickVec::float4_sse4_1 y(static_cast<float>(iy) / RESOLUTION);
+			for (int ix = 0; ix +3 < RESOLUTION; ix+=4) {
+				QuickVec::float4_sse4_1 x(ix, ix + 1, ix + 2, ix + 3);
+				x /= RESOLUTION;
+				QuickVec::float4_sse4_1 z, zi; //auto set to zero
+				for (int i = 0; i < ITERATIONS; i++) {
+					QuickVec::float4_sse4_1::bool_t is_finished = (z*z + zi*zi) < 4.0f;
+					if (is_finished.all()) break;
+					z = z*z + zi*zi + x;
+					zi = z*zi*2.0f + y;
+				}
+			}
+		}
+		auto end = clock::now();
+		time_diff duration = end - start;
+		std::cout << "Mandelbrot took " << duration.count() << "s\n";
+		delete[] vals;
+	}
+
 	std::cin.ignore();
 
 	return 0;

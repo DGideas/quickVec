@@ -2,7 +2,6 @@
 
 #include <array>
 #include <iostream>
-#include "array_accessor.hpp"
 
 namespace QuickVec {
 
