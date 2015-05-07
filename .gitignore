@@ -7,4 +7,4 @@ ipch/
 *.suo
 *.exe
 *.obj
-*.opensd
+*.opensdf

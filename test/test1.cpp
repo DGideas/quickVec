@@ -9,116 +9,86 @@ using namespace QuickVec;
 
 namespace QuickVecTest
 {
-
-	template<typename T>
-	int areEqualWrapper(const T& a, const T& b) {
-		Assert::AreEqual(a, b);
-		return 0;
-	}
-	template<class fp, size_t...I> 
-	void testConstructImpl(std::index_sequence<I...>) {
-		fp f((static_cast<float>(I))...);
-		int _[] = {
-			(areEqualWrapper(static_cast<float>(I), f[I]))...
-		};
-	}
-
-	template<class fp, typename Indices = std::make_index_sequence<fp::Size>::type>
-	void testConstruct() {
-		testConstructImpl<fp>(Indices());
-	}
-
-	template<class fp, template <typename> class Op, size_t...I>
-	void testOpImpl(std::index_sequence<I...>) {
-		Op<fp> op;
-		Op<float> op2;
-		fp f1((static_cast<float>(I)+1)...);
-		fp f2((static_cast<float>(I)+fp::Size)...);
-		fp f3 = op(f1, f2);
-		for (int i = 0; i < fp::Size; i++) {
-			Assert::AreEqual(op2(f1[i], f2[i]), f3[i]);
-		}
-
-	}
-
-	template<class fp, template <typename> class Op, typename Indices = std::make_index_sequence<fp::Size>::type>
-	void testOp() {
-		testOpImpl<fp, Op>(Indices());
-	}
-
-	template <typename fp>
-	struct TestDestOp{
-		template<typename A, typename B>
-		static void test(A op, B opDest) {
-			fp f1;
-			fp f2;
-			for (size_t i = 0; i < fp::Size; i++) {
-				f1[i] = static_cast<float>(i);
-				f2[i] = static_cast<float>(i + fp::Size);
-			}
+	TEST_CLASS(Float4Test)
+	{
+		template<class fp, template <typename> class Op, size_t...I>
+		void testOpImpl(std::index_sequence<I...>) {
+			Op<fp> op;
+			Op<float> op2;
+			fp f1((static_cast<float>(I) + 1)...);
+			fp f2((static_cast<float>(I) + fp::Size)...);
 			fp f3 = op(f1, f2);
-			opDest(f1, f2);
 			for (int i = 0; i < fp::Size; i++) {
-				// Test for bitwise equality using uint32_t. Otherwise fail on NAN with float.
-				Assert::AreEqual(reinterpret_cast<const uint32_t&>(f1[i]), reinterpret_cast<const uint32_t&>(f3[i]));
+				Assert::AreEqual(op2(f1[i], f2[i]), f3[i]);
 			}
-		}
-	};
 
-	TEST_CLASS(SequentialTest1)
-	{
+		}
+
+		template<class fp, template <typename> class Op, typename Indices = std::make_index_sequence<fp::Size>::type>
+		void testOp() {
+			testOpImpl<fp, Op>(Indices());
+		}
+
+		template <typename fp>
+		struct TestDestOp {
+			template<typename A, typename B>
+			static void test(A op, B opDest) {
+				fp f1;
+				fp f2;
+				for (size_t i = 0; i < fp::Size; i++) {
+					f1[i] = static_cast<float>(i);
+					f2[i] = static_cast<float>(i + fp::Size);
+				}
+				fp f3 = op(f1, f2);
+				opDest(f1, f2);
+				for (int i = 0; i < fp::Size; i++) {
+					// Test for bitwise equality using uint32_t. Otherwise fail on NAN with float.
+					Assert::AreEqual(reinterpret_cast<const uint32_t&>(f1[i]), reinterpret_cast<const uint32_t&>(f3[i]));
+				}
+			}
+		};
 	public:
-		
-		TEST_METHOD(TestConstruct1)
-		{
-			testConstruct<float_base<4, float>>();
+		template<typename fp>
+		void testConstruct() {
+			//construct order check
+			fp a(1.0f, 2.0f, 3.0f, 4.0f);
+			Assert::AreEqual(1.0f, a[0]);
+			Assert::AreEqual(2.0f, a[1]);
+			Assert::AreEqual(3.0f, a[2]);
+			Assert::AreEqual(4.0f, a[3]);
+			//construct from singular check
+			fp b(2.0f);
+			Assert::AreEqual(2.0f, b[0]);
+			Assert::AreEqual(2.0f, b[1]);
+			Assert::AreEqual(2.0f, b[2]);
+			Assert::AreEqual(2.0f, b[3]);
 		}
 
-		TEST_METHOD(TestArithmetic1)
+		TEST_METHOD(TestConstruct)
 		{
-			testOp<float_base<4, float>, std::plus>();
-			testOp<float_base<4, float>, std::minus>();
-			testOp<float_base<4, float>, std::multiplies>();
-			testOp<float_base<4, float>, std::divides>();
-			testOp<float_base<4, float>, func::modulus>();
-			testOp<float_base<4, float>, func::bit_or>();
-			testOp<float_base<4, float>, func::bit_and>();
-			testOp<float_base<4, float>, func::bit_xor>();
-		}
-
-		TEST_METHOD(TestDestructiveArithmetic)
-		{
-			using fp = float_base<4, float>;
-			TestDestOp<fp>::test(std::plus<fp>(), [](fp& a, fp& b) { a += b; });
-			TestDestOp<fp>::test(std::minus<fp>(), [](fp& a, fp& b) { a -= b; });
-			TestDestOp<fp>::test(std::multiplies<fp>(), [](fp& a, fp& b) { a *= b; });
-			TestDestOp<fp>::test(std::divides<fp>(), [](fp& a, fp& b) { a /= b; });
-			TestDestOp<fp>::test(func::modulus<fp>(), [](fp& a, fp& b) { a %= b; });
-			TestDestOp<fp>::test(func::bit_or<fp>(), [](fp& a, fp& b) { a |= b; });
-			TestDestOp<fp>::test(func::bit_and<fp>(), [](fp& a, fp& b) { a &= b; });
-			TestDestOp<fp>::test(func::bit_xor<fp>(), [](fp& a, fp& b) { a ^= b; });
-		}
-	};
-
-	TEST_CLASS(SSETest1)
-	{
-	public:
-
-		TEST_METHOD(TestConstruct1)
-		{
+			testConstruct<float_base<4>>();
 			testConstruct<float4_sse>();
+			testConstruct<float4_sse2>();
+			testConstruct<float4_sse4_1>();
 		}
 
-		TEST_METHOD(TestArithmetic1)
-		{
-			testOp<float4_sse, std::plus>();
-			testOp<float4_sse, std::minus>();
-			testOp<float4_sse, std::multiplies>();
-			testOp<float4_sse, std::divides>();
-			testOp<float4_sse, func::modulus>();
-			testOp<float4_sse, func::bit_or>();
-			testOp<float4_sse, func::bit_and>();
-			testOp<float4_sse, func::bit_xor>();
+		template<typename fp>
+		void testArithmetic() {
+			testOp<fp, std::plus>();
+			testOp<fp, std::minus>();
+			testOp<fp, std::multiplies>();
+			testOp<fp, std::divides>();
+			testOp<fp, func::modulo>();
+			testOp<fp, func::bit_or>();
+			testOp<fp, func::bit_and>();
+			testOp<fp, func::bit_xor>();
+		}
+
+		TEST_METHOD(TestArithmetic1){
+			testArithmetic<float_base<4>>();
+			testArithmetic<float4_sse>();
+			testArithmetic<float4_sse2>();
+			testArithmetic<float4_sse4_1>();
 		}
 
 		template < typename A, typename B> 
@@ -132,25 +102,229 @@ namespace QuickVecTest
 			}
 		}
 
+		template< typename fp>
+		void testDestructiveArithmetic() {
+			TestDestOp<fp>::test(func::plus<fp>(), [](fp& a, fp& b) { a += b; });
+			TestDestOp<fp>::test(func::minus<fp>(), [](fp& a, fp& b) { a -= b; });
+			TestDestOp<fp>::test(func::multiply<fp>(), [](fp& a, fp& b) { a *= b; });
+			TestDestOp<fp>::test(func::divide<fp>(), [](fp& a, fp& b) { a /= b; });
+			TestDestOp<fp>::test(func::modulo<fp>(), [](fp& a, fp& b) { a %= b; });
+			TestDestOp<fp>::test(func::bit_or<fp>(), [](fp& a, fp& b) { a |= b; });
+			TestDestOp<fp>::test(func::bit_and<fp>(), [](fp& a, fp& b) { a &= b; });
+			TestDestOp<fp>::test(func::bit_xor<fp>(), [](fp& a, fp& b) { a ^= b; });
+		}
+
 		TEST_METHOD(TestDestructiveArithmeticSSE)
 		{
-			using fp = float4_sse;
-			TestDestOp<fp>::test(std::plus<fp>(), [](float4_sse& a, float4_sse& b) { a += b; });
-			TestDestOp<fp>::test(std::minus<fp>(), [](float4_sse& a, float4_sse& b) { a -= b; });
-			TestDestOp<fp>::test(std::multiplies<fp>(), [](float4_sse& a, float4_sse& b) { a *= b; });
-			TestDestOp<fp>::test(std::divides<fp>(), [](float4_sse& a, float4_sse& b) { a /= b; });
+			testDestructiveArithmetic<float_base<4>>();
+			testDestructiveArithmetic<float4_sse>();
+			testDestructiveArithmetic<float4_sse2>();
+			testDestructiveArithmetic<float4_sse4_1>();
 		}
 
-		TEST_METHOD(TestModuloSSE2) {
-			using fp = float4_sse2;
-			testOp<fp, func::modulus>();
-			TestDestOp<fp>::test(func::modulus<fp>(), [](fp& a, fp& b) {a %= b;});
+		template< typename fp>
+		void testSingularOps() {
+			fp a(1, 2, 3, 4);
+			fp b = a;
+			a += 4;
+			Assert::AreEqual(a[0], 5.0f);
+			Assert::AreEqual(a[1], 6.0f);
+			Assert::AreEqual(a[2], 7.0f);
+			Assert::AreEqual(a[3], 8.0f);
+			a -= b;
+			Assert::AreEqual(a[0], 4.0f);
+			Assert::AreEqual(a[1], 4.0f);
+			Assert::AreEqual(a[2], 4.0f);
+			Assert::AreEqual(a[3], 4.0f);
+			a -= 4;
+			Assert::AreEqual(a[0], 0.0f);
+			Assert::AreEqual(a[1], 0.0f);
+			Assert::AreEqual(a[2], 0.0f);
+			Assert::AreEqual(a[3], 0.0f);
 		}
 
-		TEST_METHOD(TestModuleSSE4_1) {
-			using fp = float4_sse4_1;
-			testOp<fp, func::modulus>();
-			TestDestOp<fp>::test(func::modulus<fp>(), [](fp& a, fp& b) {a %= b;});
+		TEST_METHOD(TestSingularOps) {
+			testSingularOps<float_base<4>>();
+			testSingularOps<float4_sse>();
+			testSingularOps<float4_sse2>();
+			testSingularOps<float4_sse4_1>();
+		}
+
+		template<typename fp>
+		void testModuloNeg() {
+			fp a(10, -20, 30, -40);
+			fp b(20, 7, -7, -6);
+			fp c = a % b;
+			a %= b;
+			Assert::AreEqual(10.0f, c[0]);
+			Assert::AreEqual(1.0f, c[1]);
+			Assert::AreEqual(2.0f, c[2]);
+			Assert::AreEqual(2.0f, c[3]);
+		}
+
+		TEST_METHOD(TestModuloNeg) {
+			testModuloNeg<float_base<4>>();
+			testModuloNeg<float4_sse>();
+			testModuloNeg<float4_sse2>();
+			testModuloNeg<float4_sse4_1>();
+		}
+
+		template<typename fp>
+		void testUnaryOps() {
+			fp a(0.0f, 1, 2, 3);
+			fp b = -a;
+			fp c = ~a;
+			fp d = !a;
+			for (int i = 0; i < 4; i++) { Assert::AreEqual(-a[i], b[i]); }
+			for (int i = 0; i < 4; i++) { Assert::AreEqual(~reinterpret_cast<const int32_t&>(a[i]), reinterpret_cast<const int32_t&>(c[i])); }
+			for (int i = 0; i < 4; i++) { 
+				float temp = func::logical_not<float>()(a[i]);
+				Assert::AreEqual(reinterpret_cast<const int32_t&>(temp), reinterpret_cast<const int32_t&>(d[i]));
+			}
+		}
+
+		TEST_METHOD(TestUnaryOps) {
+			testUnaryOps<float_base<4>>();
+			testUnaryOps<float4_sse>();
+			testUnaryOps<float4_sse2>();
+			testUnaryOps<float4_sse4_1>();
 		}
 	};
+
+	TEST_CLASS(Int4Test) {
+
+		template<typename VT>
+		void testConstruct() {
+			//construct order check
+			VT a(1, 2, 3, 4);
+			Assert::AreEqual(1, a[0]);
+			Assert::AreEqual(2, a[1]);
+			Assert::AreEqual(3, a[2]);
+			Assert::AreEqual(4, a[3]);
+			//construct from singular check
+			VT b(2);
+			Assert::AreEqual(2, b[0]);
+			Assert::AreEqual(2, b[1]);
+			Assert::AreEqual(2, b[2]);
+			Assert::AreEqual(2, b[3]);
+		}
+
+		TEST_METHOD(TestConstruct) {
+			testConstruct<int32_base<4>>();
+			testConstruct<int32x4_sse2>();
+			testConstruct<int32x4_sse4_1>();
+		}
+
+		template<typename VT,template <typename...> typename Op>
+		void testOp() {
+			Op<VT> opV;
+			Op<int> opT;
+			VT v(1, 2, 3, 4);
+			VT v2(1, 2, 3, 4);
+			VT res = opV(v, v2);
+			for (uint32_t i = 0; i < 4; i++) {
+				int resT = opT(v[i], v2[i]);
+				Assert::AreEqual(resT, res[i]);
+			}
+		}
+
+		template<typename VT>
+		void testBinaryArithmetic() {
+			testOp<VT, func::plus>();
+			testOp<VT, func::minus>();
+			testOp<VT, func::multiply>();
+			testOp<VT, func::divide>();
+			testOp<VT, func::modulo>();
+			testOp<VT, func::bit_or>();
+			testOp<VT, func::bit_and>();
+			testOp<VT, func::bit_xor>();
+			testOp<VT, func::shift_left>();
+			testOp<VT, func::shift_right>();
+		}
+
+		TEST_METHOD(TestBinaryArithmetic) {
+			testBinaryArithmetic<int32_base<4>>();
+			testBinaryArithmetic<int32x4_sse2>();
+			testBinaryArithmetic<int32x4_sse4_1>();
+		}
+
+		template<typename VT>
+		bool equal(const VT& a, const VT& b) {
+			for (uint32_t i = 0; i < 4; i++) {
+				if (a[i] != b[i]) return false;
+			}
+			return true;
+		}
+
+		template<typename VT>
+		void testDestructiveBinaryArithmetic() {
+			VT v(1, 2, 3, 4);
+			VT a = v;
+			VT b = v;
+			Assert::IsTrue(equal(b += 1, a + 1));
+			a = v;
+			b = v;
+			Assert::IsTrue(equal(b -= 1, a - 1));
+			a = v;
+			b = v;
+			Assert::IsTrue(equal(b /= 1, a / 1));
+			a = v;
+			b = v;
+			Assert::IsTrue(equal(b *= 1, a * 1));
+			a = v;
+			b = v;
+			Assert::IsTrue(equal(b %= 1, a % 1));
+			a = v;
+			b = v;
+			Assert::IsTrue(equal(b |= 1, a | 1));
+			a = v;
+			b = v;
+			Assert::IsTrue(equal(b &= 1, a & 1));
+			a = v;
+			b = v;
+			Assert::IsTrue(equal(b ^= 1, a ^ 1));
+			a = v;
+			b = v;
+			Assert::IsTrue(equal(b <<= 1, a << 1));
+			a = v;
+			b = v;
+			Assert::IsTrue(equal(b >>= 1, a >> 1));
+		}
+
+		TEST_METHOD(TestDestructiveBinaryArithmetic) {
+			testDestructiveBinaryArithmetic<int32_base<4>>();
+			testDestructiveBinaryArithmetic<int32x4_sse2>();
+			testDestructiveBinaryArithmetic<int32x4_sse4_1>();
+		}
+
+		template<typename VT>
+		void testUnaryArithmetic() {
+			VT a(1, 2, 3, 4);
+			VT b = -a;
+			VT c = ~a;
+			VT d = !a;
+			for (int i = 0; i < 4; i++) { Assert::AreEqual(-a[i], b[i]); }
+			for (int i = 0; i < 4; i++) { Assert::AreEqual(~a[i], c[i]); }
+			for (int i = 0; i < 4; i++) { Assert::AreEqual((!a[i])?-1:0, d[i]); }
+		}
+
+		TEST_METHOD(TestUnaryArithmetic) {
+			testUnaryArithmetic<int32_base<4>>();
+			testUnaryArithmetic<int32x4_sse2>();
+			testUnaryArithmetic<int32x4_sse4_1>();
+		}
+
+		template<typename VT>
+		void testSingular() {
+			VT a = 1;
+			for (int i = 0; i < 4; i++) { Assert::AreEqual(1, a[i]); }
+		}
+
+		TEST_METHOD(TestSingular) {
+			testSingular<int32_base<4>>();
+			testSingular<int32x4_sse2>();
+			testSingular<int32x4_sse4_1>();
+		}
+	};
+
 }
