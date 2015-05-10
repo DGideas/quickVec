@@ -6,6 +6,6 @@
 
 namespace QuickVec {
 
-	template<size_t N, typename Data_t = typename std::array<int, N>, typename DataAccessor = array_accessor<int, N>>
-	using int32_base = numeric_base<N, int, Data_t, DataAccessor>;
+	template<size_t N>
+	using int32_base = numeric_base<int, N>;
 }

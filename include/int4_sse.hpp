@@ -2,33 +2,30 @@
 #include "int_base.hpp"
 
 namespace QuickVec {
-	struct m128i_accessor {
-		template<size_t I>
-		static int32_t& get(__m128i& data) {
-			return data.m128i_i32[I];
-		}
 
-		template<size_t I>
-		static int32_t get(const __m128i& data) {
-			return data.m128i_i32[I];
-		}
-
-		static int32_t& get(__m128i& data, size_t I) {
-			return data.m128i_i32[I];
-		}
-
-		static int32_t get(const __m128i& data, size_t I) {
-			return data.m128i_i32[I];
-		}
-	};
-
-	class int32x4_sse2 : public int32_base<4, __m128i, m128i_accessor> {
+	class alignas(__m128i) int32x4_sse2 : public int32_base<4> {
 	protected:
 		static const uint32_t N = 4;
 		using T = int32_t;
 		using Data_t = __m128i;
 		using this_t = int32x4_sse2;
-		using base_t = int32_base<4, __m128i, m128i_accessor>;
+		using base_t = int32_base<4>;
+
+		__m128i& m128i_data() {
+			return reinterpret_cast<__m128i&>(data);
+		}
+		
+		const __m128i& m128i_data() const {
+			return reinterpret_cast<const __m128i&>(data);
+		}
+
+		__m128& m128_data() {
+			return reinterpret_cast<__m128&>(data);
+		}
+
+		const __m128& m128_data() const {
+			return reinterpret_cast<const __m128&>(data);
+		}
 
 		//helpers
 		// Sets all bits in the vector to one giving 0xFF.....FFFF
@@ -43,15 +40,15 @@ namespace QuickVec {
 		int32x4_sse2(const base_t& o) : base_t(o) {};
 
 		int32x4_sse2(int32_t a, int32_t b, int32_t c, int32_t d){
-			data = _mm_setr_epi32(a, b, c, d);
+			m128i_data() = _mm_setr_epi32(a, b, c, d);
 		};
 
 		int32x4_sse2(T a) {
-			data = _mm_set1_epi32(a);
+			m128i_data() = _mm_set1_epi32(a);
 		}
 
 		int32x4_sse2(Data_t&& d){
-			data = d;
+			m128i_data() = d;
 		}
 
 		////////////////////////////////
@@ -59,12 +56,12 @@ namespace QuickVec {
 		////////////////////////////////
 
 		// Addition
-		this_t& operator+=(const this_t& o) { data = _mm_add_epi32(data, o.data); return *this; }
-		this_t operator+(const this_t& o) const { return _mm_add_epi32(data, o.data); }
+		this_t& operator+=(const this_t& o) { m128i_data() = _mm_add_epi32(m128i_data(), o.m128i_data()); return *this; }
+		this_t operator+(const this_t& o) const { return _mm_add_epi32(m128i_data(), o.m128i_data()); }
 
 		//Subtraction
-		this_t& operator-=(const this_t& o) { data = _mm_sub_epi32(data, o.data); return *this; }
-		this_t operator-(const this_t& o) const { return _mm_sub_epi32(data, o.data); }
+		this_t& operator-=(const this_t& o) { m128i_data() = _mm_sub_epi32(m128i_data(), o.m128i_data()); return *this; }
+		this_t operator-(const this_t& o) const { return _mm_sub_epi32(m128i_data(), o.m128i_data()); }
 
 		//Multiplication
 	private:
@@ -74,8 +71,8 @@ namespace QuickVec {
 			return _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0))); /* shuffle results to [63..0] and pack */
 		}
 	public:
-		this_t& operator*=(const this_t& o) { data = multiply(data, o.data); return *this; }
-		this_t operator*(const this_t& o) const { return multiply(data, o.data); }
+		this_t& operator*=(const this_t& o) { m128i_data() = multiply(m128i_data(), o.m128i_data()); return *this; }
+		this_t operator*(const this_t& o) const { return multiply(m128i_data(), o.m128i_data()); }
 
 		//Division not possible
 		//XXXXXXXXXXX
@@ -84,32 +81,32 @@ namespace QuickVec {
 		//XXXXXXXXXXX
 		
 		//Bit or
-		this_t& operator|=(const this_t& o) { data = _mm_or_si128(data, o.data); return *this; }
-		this_t operator|(const this_t& o) const { return _mm_or_si128(data, o.data); }
+		this_t& operator|=(const this_t& o) { m128i_data() = _mm_or_si128(m128i_data(), o.m128i_data()); return *this; }
+		this_t operator|(const this_t& o) const { return _mm_or_si128(m128i_data(), o.m128i_data()); }
 
 		//Bit and
-		this_t& operator&=(const this_t& o) { data = _mm_and_si128(data, o.data); return *this; }
-		this_t operator&(const this_t& o) const { return _mm_and_si128(data, o.data); }
+		this_t& operator&=(const this_t& o) { m128i_data() = _mm_and_si128(m128i_data(), o.m128i_data()); return *this; }
+		this_t operator&(const this_t& o) const { return _mm_and_si128(m128i_data(), o.m128i_data()); }
 
 		//Bit xor
-		this_t& operator^=(const this_t& o) { data = _mm_xor_si128(data, o.data); return *this; }
-		this_t operator^(const this_t& o) const { return _mm_xor_si128(data, o.data); }
+		this_t& operator^=(const this_t& o) { m128i_data() = _mm_xor_si128(m128i_data(), o.m128i_data()); return *this; }
+		this_t operator^(const this_t& o) const { return _mm_xor_si128(m128i_data(), o.m128i_data()); }
 
 		//Shift right
 		// no vector to vector operator
 		this_t& operator>>=(const this_t& o) { base_t::operator>>=(o); return *this; }
 		this_t operator>>(const this_t& o) const { return base_t::operator>>(o); }
 		//explicit singular operator for efficiency
-		this_t& operator>>=(const T& o) { data = _mm_srai_epi32(data, o); return *this; }
-		this_t operator>>(const T& o) const { return _mm_srai_epi32(data, o); }
+		this_t& operator>>=(const T& o) { m128i_data() = _mm_srai_epi32(m128i_data(), o); return *this; }
+		this_t operator>>(const T& o) const { return _mm_srai_epi32(m128i_data(), o); }
 
 		//Shift left
 		// no vector to vector operator
 		this_t& operator<<=(const this_t& o) { base_t::operator<<=(o); return *this; }
 		this_t operator<<(const this_t& o) const { return base_t::operator<<(o); }
 		//explicit singular operator for efficiency
-		this_t& operator<<=(const T& o) { data = _mm_slli_epi32(data, o); return *this; }
-		this_t operator<<(const T& o) const { return _mm_slli_epi32(data, o); }
+		this_t& operator<<=(const T& o) { m128i_data() = _mm_slli_epi32(m128i_data(), o); return *this; }
+		this_t operator<<(const T& o) const { return _mm_slli_epi32(m128i_data(), o); }
 
 		////////////////////////////////
 		// Unary Operators
@@ -117,7 +114,7 @@ namespace QuickVec {
 		//-~!
 		this_t operator-() const { return this_t(_mm_setzero_si128()) - *this; }
 		this_t operator~() const { return this_t(allOnes()) ^ *this; }
-		this_t operator!() const { return _mm_cmpeq_epi32(_mm_setzero_si128(), data); }
+		this_t operator!() const { return _mm_cmpeq_epi32(_mm_setzero_si128(), m128i_data()); }
 
 		//Comparisons
 		//== != < <= > >=
@@ -142,8 +139,8 @@ namespace QuickVec {
 		////////////////////////////////
 		// Binary Operators
 		////////////////////////////////
-		this_t& operator*=(const this_t& o) { data = _mm_mullo_epi32(data, o.data); return *this; }
-		this_t operator*(const this_t& o) const { return _mm_mullo_epi32(data, o.data); }
+		this_t& operator*=(const this_t& o) { m128i_data() = _mm_mullo_epi32(m128i_data(), o.m128i_data()); return *this; }
+		this_t operator*(const this_t& o) const { return _mm_mullo_epi32(m128i_data(), o.m128i_data()); }
 	};
 
 }
