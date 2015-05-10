@@ -10,30 +10,22 @@ namespace QuickVec {
 
 		using this_t = float8_avx;
 		using bool_t = bool8_avx;
+		using data_t = __m256;
 
-		class alignas(__m256) bool8_avx
+		class alignas(data_t) bool8_avx
 		{
 			// Only implicitly convert to and from raw in private
-			bool_t(const __m256& o) : raw(o) {};
-			operator __m256 () const { return raw; }
+			bool_t(const data_t& o) : raw(o) {};
+			operator data_t () const { return raw; }
 		public:
 			static const size_t size = 8;
-			__m256 raw;
+			data_t raw;
 			bool_t() = default;
 			bool_t(bool_t&& o) = default;
 			bool_t(const bool_t& o) = default;
-			bool_t(const bool& o) {
-				if (o) {
-					raw = _mm256_cmp_ps(raw, raw, _CMP_EQ_UQ);
-				}
-				else {
-					raw = _mm256_xor_ps(raw, raw);
-				}
-			}
+			bool_t(const bool& o);
 
-			bool all() {
-				return (_mm256_testc_ps(bool_t(true), raw) != 0);
-			}
+			bool all() const;
 
 			friend class float8_avx;
 
@@ -48,51 +40,55 @@ namespace QuickVec {
 			friend bool_t operator>(const this_t& a, const this_t& b);
 		};
 
-		class alignas(__m256) float8_avx
+		inline bool_t::bool8_avx(const bool& o) {
+			if (o) {
+				raw = _mm256_cmp_ps(raw, raw, _CMP_EQ_UQ);
+			}
+			else {
+				raw = _mm256_xor_ps(raw, raw);
+			}
+		}
+
+		inline bool bool_t::all() const {
+			return (_mm256_testc_ps(bool_t(true), raw) != 0);
+		}
+
+		inline bool all(const bool_t& b) {
+			return b.all();
+		}
+
+		class alignas(data_t) float8_avx
 		{
 			// Only implicitly convert to and from raw in private
-			this_t(const __m256& o) : raw(o) {};
-			operator __m256 () const { return raw; }
+			this_t(const data_t& o) : raw(o) {};
+			operator data_t () const { return raw; }
 		public:
 			using bool_t = bool_t;
 			static const size_t size = 8;
-			__m256 raw;
-			__forceinline this_t() {
-				raw = _mm256_setzero_ps();
-			}
-			__forceinline this_t(this_t&& o) = default;
-			__forceinline this_t(const this_t& o) = default;
-			__forceinline this_t& operator=(const this_t& o) = default;
+			data_t raw;
+			this_t();
+			this_t(this_t&& o) = default;
+			this_t(const this_t& o) = default;
+			this_t& operator=(const this_t& o) = default;
 			
-			__forceinline this_t(float o) {
-				raw = _mm256_set1_ps(o);
-			}
-			
-			__forceinline this_t(float a, float b, float c, float d, float e, float f, float g, float h) {
-				raw = _mm256_setr_ps(a, b, c, d, e, f, g, h);
-			}
-
-			static this_t loadAligned(const float* ptr) {
-				return _mm256_load_ps(ptr);
+			this_t(float o);
+			this_t(const float* ptr, bool aligned = false) {
+				if (aligned) {
+					raw = loadAligned(ptr);
+				}
+				else {
+					raw = load(ptr);
+				}
 			}
 
-			static this_t load(const float* ptr) {
-				return _mm256_loadu_ps(ptr);
-			}
+			static this_t loadAligned(const float* ptr);
+			static this_t load(const float* ptr);
 
-			void store(float* ptr) {
-				_mm256_storeu_ps(ptr, raw);
-			}
+			void store(float* ptr);
+			void storeAligned(float* ptr);
 
-			this_t& if_set(const bool_t& mask, const this_t& newVal) {
-				raw = _mm256_blendv_ps(raw, newVal, mask);
-				return *this;
-			}
-
-			this_t& if_not_set(const bool_t& mask, const this_t& newVal) {
-				raw = _mm256_blendv_ps(newVal, raw, mask);
-				return *this;
-			}
+			this_t& if_set(const bool_t& mask, const this_t& newVal);
+			this_t& if_not_set(const bool_t& mask, const this_t& newVal);
 
 			friend this_t operator+(const this_t& a, const this_t& b);
 			friend this_t operator-(const this_t& a, const this_t& b);
@@ -112,8 +108,39 @@ namespace QuickVec {
 			friend bool_t operator>(const this_t& a, const this_t& b);
 		};
 
-		using this_t = float8_avx;
-		using bool_t = bool8_avx;
+		inline this_t::float8_avx() {
+			raw = _mm256_setzero_ps();
+		}
+
+		inline this_t::float8_avx(float o) {
+			raw = _mm256_set1_ps(o);
+		}
+
+		inline this_t this_t::loadAligned(const float* ptr) {
+			return _mm256_load_ps(ptr);
+		}
+
+		inline this_t this_t::load(const float* ptr) {
+			return _mm256_loadu_ps(ptr);
+		}
+
+		inline void this_t::store(float* ptr) {
+			_mm256_storeu_ps(ptr, raw);
+		}
+		
+		inline void this_t::storeAligned(float* ptr) {
+			_mm256_storeu_ps(ptr, raw);
+		}
+
+		this_t& this_t::if_set(const bool_t& mask, const this_t& newVal) {
+			raw = _mm256_blendv_ps(raw, newVal, mask);
+			return *this;
+		}
+
+		this_t& this_t::if_not_set(const bool_t& mask, const this_t& newVal) {
+			raw = _mm256_blendv_ps(newVal, raw, mask);
+			return *this;
+		}
 
 		/////////////////////////////////////////////////////////////
 		// float8 arithmetic operators

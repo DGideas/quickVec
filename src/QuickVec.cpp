@@ -44,7 +44,8 @@ template<typename float_vec, size_t RESOLUTION, size_t ITERATIONS>
 void doMandelbrotVector(float* results) {
 	auto start = my_clock::now();
 	for (int I = 0; I < 100; I++) {
-		float_vec increment(0, 1, 2, 3, 4, 5, 6, 7);
+		float incr[] = {0, 1, 2, 3, 4, 5, 6, 7};
+		float_vec increment(incr);
 		float_vec one = 1.0f;
 		float_vec four = 4.0f;
 		float_vec oneOverRes = 1.0f / RESOLUTION;
