@@ -8,21 +8,30 @@
   <!-- CSS  -->
   <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/prism.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <style>
+    .big-af-text {
+      font-size: 150px
+    }
+    .medium-af-text {
+      font-size: 75px
+    }
+  </style>
 </head>
-<body class="blue-grey lighten-3">
-  <nav class="blue-grey lighten-1" role="navigation">
+<body class="blue-grey darken-1 white-text">
+  <nav class="blue-grey darken-2" role="navigation">
     <div class="container">
-      <div class="nav-wrapper"><a id="logo-container" href="#" class="brand-logo">QuickVec C++</a>
+      <div class="nav-wrapper"><a id="logo-container" href="#" class="brand-logo white-text">QuickVec C++</a>
         <ul id="nav-mobile" class="right side-nav">
-          <li><a href="#Summary">Summary</a></li>
-          <li><a href="#Background">Background</a></li>
-          <li><a href="#Challenge">Challenge</a></li>
-          <li><a href="#Resources">Resources</a></li>
-          <li><a href="#Goals">Goals</a></li>
-          <li><a href="#Why">Why cross-platform C++?</a></li>
-          <li><a href="#Schedule">Schedule</a></li>
-          <li><a href="#Tasks">Tasks</a></li>
-          <li><a href="#Deliverables">Deliverables</a></li>
+          <li><a class="white-text" href="#Summary">Summary</a></li>
+          <li><a class="white-text" href="#Background">Background</a></li>
+          <li><a class="white-text" href="#Challenge">Challenge</a></li>
+          <li><a class="white-text" href="#Resources">Resources</a></li>
+          <li><a class="white-text" href="#Goals">Goals</a></li>
+          <li><a class="white-text" href="#Why">Why cross-platform C++?</a></li>
+          <li><a class="white-text" href="#Schedule">Schedule</a></li>
+          <li><a class="white-text" href="#Tasks">Tasks</a></li>
+          <li><a class="white-text" href="#Deliverables">Deliverables</a></li>
         </ul><a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
       </div>
     </div>
@@ -37,7 +46,9 @@
           <h5 class="header col s12 light">A modern C++ approach to explicit SIMD vectorization.</h5>
         </div>
         <div class="row center">
-          <a href="proposal.html" id="proposal-button" class="waves-effect waves-light btn-large">proposal</a>
+          <!--<a href="proposal.html" id="proposal-button" class="waves-effect waves-light btn-large">Proposal</a>-->
+          <!--<a href="progress.html" id="progress-button" class="waves-effect waves-light btn-large">Mid-term Progress</a>-->
+          <a href="#Performance" id="performance-button" class="waves-effect waves-light btn-large">Performance Results</a>
           <a href="#" id="download-button" class="waves-effect waves-light btn-large disabled">Download</a>
         </div>
         <br><br>
@@ -50,38 +61,26 @@
     <div class="section">
       <div class="row">
         <div class="col offset-l3 l6 s12 center">
-          <h4>Summary</h4>
-          <p class="left-align light">QuickVec C++ will be a modern C++ approach to explicit cross-platform SIMD vectorization. It will enable developers access to the power of the hardware SIMD feature sets using a common set of features.</p>
+          <h2>Summary</h2>
+          <p class="left-align">QuickVec C++ is a modern C++ approach to explicit cross-platform SIMD vectorization. It enables developers to access the power of the hardware SIMD feature sets using a common set of accelerated functions.</p>
         </div>
       </div>
     </div>
   </div>
   
-  <!-- Parallax divider
-  <div class="parallax-container valign-wrapper">
-    <div class="section no-pad-bot">
-      <div class="container">
-        <div class="row center">
-          <h5 class="header col s12 light"></h5>
-        </div>
-      </div>
-    </div>
-    <div class="parallax"><img src="stars1.jpg" alt="Unsplashed background img 3"></div>
-  </div>  -->
-  
-  <div class="blue-grey lighten-2">
+  <div class="blue-grey">
     <div class="container" id="Background">
       <div class="section">
         <div class="row">
           <div class="col s12">
-            <h3 class="center">Background</h3>
+            <h2 class="center">Background</h2>
           </div>
         </div>
         <!--   Icon Section   -->
         <div class="row">
           <div class="col s12 m4">
             <div class="icon-block">
-              <h2 class="center brown-text"><i class="mdi-image-flash-on"></i></h2>
+              <div class="center amber-text lighten-1 big-af-text"><i class="mdi-image-flash-on"></i></div>
               <h5 class="center">Speed</h5>
               <p class="light">Efficiency and performance are important to many high performance applications. QuickVec C++ will be implemented with a focus on performance and efficiency. It will expose the power of the SIMD instructions available on the hardware on each system without forcing the user to duplicate any work.</p>
             </div>
@@ -89,7 +88,7 @@
 
           <div class="col s12 m4">
             <div class="icon-block">
-              <h2 class="center brown-text"><i class="mdi-social-group"></i></h2>
+              <div class="center red-text lighten-1 big-af-text"><i class="mdi-social-group"></i></div>
               <h5 class="center">Familiar Development</h5>
               <p class="light">It is important to developers to work with well designed systems that follow the paradigms that they know and understand. The QuickVec C++ library will attempt to match the patterns presented by the C++ standard library and STL. This will ease the development process greatly.</p>
             </div>
@@ -97,12 +96,13 @@
 
           <div class="col s12 m4">
             <div class="icon-block">
-              <h2 class="center brown-text">
+              <div class="center light-green-text lighten-1 medium-af-text">
                 <i class="mdi-hardware-desktop-windows"></i>
                 <i class="mdi-action-android"></i>
+                </br>
                 <i class="mdi-hardware-smartphone"></i>
                 <i class="mdi-hardware-laptop"></i>
-              </h2>
+              </div>
               <h5 class="center">Cross-Platform</h5>
               <p class="light">When developing applications for multiple platforms, it not only inconvenient for developers to use multiple SIMD intrinsic sets, but also inefficient and time-consuming. The QuickVec C++ library will maintain its performance while being fully cross-platform. This means that functions written using the library should run on any of the supported platforms with no extra effort expended.</p>
             </div>
@@ -128,92 +128,61 @@
     <div class="section">
       <div class="row">
         <div class="col offset-l3 l6 s12 center">
-          <h4>Challenge</h4>
-          <p class="left-align light">The major challenge of this project is bringing all of the targets together in one library. The target instruction sets include SSE (versions 1-5), AVX (1,2, and 512-bit), and ARM Neon. The challenge for this project is that there are many differing sets of intrinsics for different instruction feature sets and platforms. A large part of the challenge will be determining which features are available for a processor at runtime and executing with little to no overhead in comparison to a sequential implementation if the SIMD operations are not available. The second challenge is getting results with little to no difference in speed with a similarly written SIMD intrinsics implementation.</p>
+          <h2>Challenge</h2>
+          <p class="left-align">The major challenge of this project was bringing all of the targets together in one library. The target instruction sets include SSE (versions 1-4.2), AVX (1,2, and 512-bit), and ARM Neon. There are many differing sets of intrinsics for different instruction feature sets and platforms. A large part of the project is determining which features are available for a processor at runtime and executing with little to no overhead in comparison to a sequential implementation if the SIMD instructions are not available. The second challenge is getting results with little to no difference in speed with a similarly written SIMD intrinsics implementation.</p>
         </div>
       </div>
     </div>
   </div>
   
-  <!-- Parallax divider
-  <div class="parallax-container valign-wrapper">
-    <div class="section no-pad-bot">
-      <div class="container">
-        <div class="row center">
-          <h5 class="header col s12 light"></h5>
-        </div>
-      </div>
-    </div>
-    <div class="parallax"><img src="stars2.jpg" alt="Unsplashed background img 2" style="-webkit-filter: brightness(40%)"></div>
-  </div> -->
-  
-  <div class="blue-grey lighten-2">
+  <div class="blue-grey">
     <div class="container" id="Resources">
       <div class="section">
         <div class="row">
           <div class="col offset-l3 l6 s12 center">
-            <h4>Resources</h4>
+            <h2>Resources</h2>
             <p class="left-align light">I will be starting from a blank code base. For references I will be using the intrinsic documents and reference guides for SSE and AVX intrinsics found <a href="https://software.intel.com/sites/landingpage/IntrinsicsGuide/">here</a>, and ARM Neon intrinsics found <a href="https://msdn.microsoft.com/en-us/library/hh875058.aspx">here</a></p></p>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!--
-  <div class="parallax-container valign-wrapper">
-    <div class="section no-pad-bot">
-      <div class="container">
-        <div class="row center">
-          <h5 class="header col s12 light"></h5>
-        </div>
-      </div>
-    </div>
-    <div class="parallax"><img src="fractals2.png" alt="Unsplashed background img 2" style="-webkit-filter: brightness(40%)"></div>
-  </div> -->
   
   <div class="container" id="Goals">
     <div class="section">
       <div class="row">
-        <div class="col offset-l2 l8 s12 center">
-          <h4>Goals</h4>
-          <div class="left-align light">
-            <ul class="collapsible" data-collapsible="accordion">
-              <li>
-                <div class="collapsible-header active blue-grey lighten-4">
-                  <b><i class="mdi-content-add-box"></i>
-                  Find and Implement Commonalities</b>
-                </div>
-                <div class="collapsible-body">
-                  <p>I plan to look through the different intrinsic functions from the different sets and find commonalities. From there I plan to bundle as much as possible together using templates and template-specialization. This will allow the user to specify arguments such as the type (float or int), precision, and number of elements in a vector, and the template instantiate that from whatever is available from the compiled feature set.</br></br>
-                  <b>Progress:</b></br>
-                  So far I believe that I have been able to narrow in on a useful set of functionality accessible in most vector instruction sets. I plan to implement this set of features on each platform, and then expand the set of features. So far the features I plan to include are loads, stores, arithmetic operations, bitwise operations, masks, and shuffles. Of those I have covered arithmetic and bitwise operations.
-                  </p>
-                </div>
-              </li>
-              <li>
-                <div class="collapsible-header active blue-grey lighten-4">
-                  <b><i class="mdi-content-add-box"></i>
-                  Match performance</b>
-                </div>
-                <div class="collapsible-body">
-                  <p>This is in reference to firstly the sequential version of algorithms. By this I mean that when using sequential implementations due to SIMD features not being available the library will introduce only minimal overhead. Secondly, this is in reference to other libraries similar to this one, such as Yeppp!, which is a C library for cross-platform SIMD utilization. Lastly, this is relative to using the platforms intrinsics directly. This means that overhead for using SIMD via this library will be minimal.</br></br>
-                  <b>Progress:</b></br>
-                  I have not yet created a test bench for relative performance. However, when implementing classes I keep this in mind and always consider the instructions that will result from use of certain constructs. With the current implementation there is no branching overhead for use of operators, and the output from the compiler for doing an add of four numbers in both the vector class and as just floats are roughly the same.</p>
-                </div>
-              </li>
-              <li>
-                <div class="collapsible-header active blue-grey lighten-4">
-                  <b><i class="mdi-content-add-box"></i>
-                  Use modern C++ Style</b>
-                </div>
-                <div class="collapsible-body">
-                  <p>By this I mean that I will follow the interface style of the STL libraries and Boost. This includes making sure that move and value semantics are maintained for all types. This includes making vectors capable of range for loops.</br></br>
-                  <b>Progress:</b></br>
-                  This goal has been maintained in the interfaces. However, range for loops are not yet usable as those will be specialized for a dynamically sized vector class that will operate on each vector as the largest vector type supported. This is a stretch goal and is part of the task to "Add iterators and other helpers".
-                  </p>
-                </div>
-              </li>
-            </ul>
+        <h1 class="center">Goals</h1>
+        <div class="col s6 m4">
+          <div class="card medium blue-grey darken-3">
+            <div class="card-image">
+              <img src="common_interface.png">
+            </div>
+            <div class="card-content">
+              <h5>A Common Interface</h5>
+              QuickVec provides a set of accelerated classes and methods which are common to all platforms. These include common arithmetic operations as well as other common vector operations such as shuffle. Also, there is an accelerated masking interface.
+            </div>
+          </div>
+        </div>
+        <div class="col s6 m4">
+          <div class="card medium blue-grey darken-3">
+            <div class="card-image">
+              <img src="speedometer.png">
+            </div>
+            <div class="card-content">
+              <h5>Match Performance</h5>
+              QuickVec will match the performance of sequential code when accelerated versions of operations are not available on a platform. When the accelerated functionality is available, it will perform similarly to the same code written with intrinsics or the same code using a similar vectorization library such as <a href="http://www.yeppp.info/">Yeppp!</a>. <b>Benchmarks coming soon!</b>
+            </div>
+          </div>
+        </div>
+        <div class="col s6 m4">
+          <div class="card medium blue-grey darken-3">
+            <div class="card-image">
+              <img src="cpp11.png">
+            </div>
+            <div class="card-content">
+              <h5>Modern C++ Style</h5>
+              QuickVec is written with the style of STL and Boost libraries in mind. QuickVec's interface maintains value semantics. Operators are overloaded in an intuitive way that allows code to be changed only minimally in order to use vectorization.
+            </div>
           </div>
         </div>
       </div>
@@ -235,19 +204,19 @@
     <div class="section">
       <div class="row">
         <div class="col offset-l3 l6 s12 center">
-          <h4>Why use cross-platform C++?</h4>
+          <h3>Why use cross-platform C++?</h3>
           <p class="left-align light">C++ is the current standard language for high-performance cross-platform application development. It is also capable of achieving different levels of abstraction that are not available in other languages. Also, base intrinsics are available onall of the target platforms in C or C++ as a base for implementations.</p>
         </div>
       </div>
     </div>
   </div>
   
-  <div class="blue-grey lighten-2">
+  <div class="blue-grey">
     <div class="container" id="Schedule">
       <div class="section">
         <div class="row">
           <div class="col offset-l3 l6 s12 center">
-            <h4>Schedule</h4>
+            <h2>Schedule</h2>
             <table class="hoverable">
               <thead>
                 <tr>
@@ -323,39 +292,146 @@
   <div class="container" id="Tasks">
     <div class="section">
       <div class="row">
-        <div class="col offset-l3 l6 s12">
-          <div class="center"><h4>Completed Tasks</h4></div>
+        <h2 class="center">Current Implementation</h2>
+        <div class="col l4 s12">
           <h5>Test bench</h5>
-          <p>I have created a test bench using visual studio unit tests.
-          In my test bench I test the operators for consistency against the sequential implementation of each operator.</p>
-          <h5>Sequential Implementation of float operators</h5>
-          <p>The sequential implementation is designed to be the base class of all further specialized classes (such as SSE or AVX). The implementation does a compile time unroll of whatever operator is being applied across all elements of the vector. This is done using a template meta-programming technique to approximate a compile-time for each. The reason for this is to guarantee the lack of branching when operating on all vector elements. The hope for this is that if a specific platform does not properly report its use of SSE or AVX, that ILP will work smoothly for the set of instructions.</p>
-          
-          <p>I implemented all arithmetic operators for the sequential implementation. It is extendible to different floating point types and different int types, as well as to any vector width. The data type is templated as well as a class to access the data type. For the bare sequential implementation, the data type is a std::array with an accessor class that returns elements from positions in the array. Elements can be retrieved with run-time or compile-time indexes. Compile-time indexing is implemented in order to support compile-time unrolling as well as shuffling and other functions later on.</p>
-          
-          <h5>SSE 4-wide 32bit float</h5>
-          <p>I extended the sequential float class (float_base) with a class that has a data type of __128 and implemented an accessor class for it. I then overloaded all of the arithmetic operators except for the % operator, as SSE does not support modulo.</p>
+          <p>A test bench using visual studio unit tests is capable of testing the operators for consistency against the sequential implementation of each operator. The test bench tests all implemented methods.</p>
         </div>
+        <div class="col l4 s12">  
+          <h5>Sequential Implementation of 32-bit float and integer operators</h5>
+          <p>The sequential implementation is designed to be the base class of all further specialized classes (such as SSE or AVX). The implementation does a compile time unroll of whatever operator is being applied across all elements of the vector. This is done using a template meta-programming technique to approximate a compile-time for each. The reason for this is to guarantee the lack of branching when operating on all vector elements. The hope for this is that if a specific platform does not properly report its use of SSE or AVX, that ILP will work smoothly for the set of instructions.</p>
+        </div>
+        <div class="col l4 s12">
+          <h5>SSE and AVX floating point and 32-bit integers</h5>
+          <p>The SSE (all versions) implementations for 128-bit or 4-wide single precision floating point vectors and 32-bit integer vectors are complete. Also, the AVX implementations of 8-wide vectors for 32-bit floats and 32-bit signed integers are complete. These includes common arithmetic, loads, stores, and comparisons.</p>
+        </div>
+      </div>
+      <div id="Performance" class="row center-align">
+        <div class="col l5 s12">
+          <h5>Performance Results</h5>
+          <p class="left-align">This is the result of doing a mandelbrot set calculation with a maximum iteration per pixel of 100 times and a resolution of 2048x2048. Each code example was run 100 times to collect the data seen in the chart. The code was compiled using Microsoft Visual Studio with Full Optimization (/Ox) enabled. It should be noted that this means the sequentially written code has been auto-vectorized by the compiler.</p>
+          <p class="left-align">The chart to the right shows the speedup relative to the compiler optimized sequential implementation. As shown by the chart, the QuickVec code is as fast as the code written using AVX intrinsics directly. Below, it can be seen from the code example that the same code written with intrinsics becomes harder to understand. However, the code utilizing QuickVec maintains speed, but does so in a way that doesn't obfuscate the intention of the code.
+        </div>
+        <div class="col l7 s12">
+          <img class="responsive-img" src="avx_bar_test.png"/>
+        </div>
+      </div>
+      <div class="row" style="font-size: 12;">
+        <div class="col l6 s12 center-align">
+          <h4 class="center">Sequential</h4>
+          <pre><code class="language-cpp line-numbers">
+float oneOverRes = 1.0f / RESOLUTION;
+for (int iy = 0; iy < RESOLUTION; iy++) {
+  float y = iy *oneOverRes;
+  for (int ix = 0; ix < RESOLUTION; ix++) {
+    float x = ix * oneOverRes;
+    float z = 0.0f;
+    float zi = 0.0f;
+    bool finished = false;
+    int i;
+    for (i = 0; i < ITERATIONS; i++) {
+      z = (z*z) + (zi*zi) + x;
+      zi = 2.0f*z*zi + y;
+      if (((z*z) + (zi*zi)) < 4.0f) {
+        finished = true;
+        break;
+      }
+    }
+    results[ix + (iy * RESOLUTION)] = i;
+  }
+}</code></pre>
+        </div>
+        <div class="col l6 s12 center-align">
+          <h4 class="center">QuickVec AVX</h4>
+          <pre><code class="language-cpp line-numbers">
+using float_vec = QuickVec::float8_avx;
+float_vec increment(0, 1, 2, 3, 4, 5, 6, 7);
+float_vec one = 1.0f; //Single elements can be used to construct
+float_vec four = 4.0f;
+float_vec oneOverRes = 1.0f / RESOLUTION;
+for (int iy = 0; iy < RESOLUTION; iy++) {
+  float_vec y = iy * oneOverRes;
+  for (int ix = 0; ix < RESOLUTION; ix += float_vec::size) {
+    float_vec x = (increment + ix) * oneOverRes;
+    float_vec z, zi, vals; // Construction initializes to 0
+    for (int i = 0; i < ITERATIONS; i++) {
+      z = (z*z) + (zi*zi) + x;
+      // Single elements can be used with operations
+      zi = 2.0f*z*zi + y;
+      float_vec::bool_t finished = (((z*z) + (zi*zi)) < four);
+      vals.if_not_set(finished, vals + one);
+      if (finished.all())
+        break;
+    }
+    vals.store(&results[ix + (iy * RESOLUTION)]);
+  }
+}</code></pre>
+        </div>
+      </div>
+      <div class="row">
+        <h4 class="center">AVX Intrinsics</h4>
+        <pre><code class="language-cpp line-numbers">
+alignas(32) float incr[] = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f };
+__m256 increment = _mm256_load_ps(incr);
+__m256 one = _mm256_set1_ps(1.0f);
+__m256 four = _mm256_set1_ps(4.0f);
+__m256 oneOverRes = _mm256_set1_ps(1.0f / RESOLUTION);
+for (int iy = 0; iy < RESOLUTION; iy++) {
+  __m256 y = _mm256_mul_ps(_mm256_set1_ps(iy), oneOverRes);
+  for (int ix = 0; ix < RESOLUTION; ix += 8) {
+    __m256 x = _mm256_mul_ps(_mm256_add_ps(increment, _mm256_set1_ps(ix)), oneOverRes);
+    __m256 z = _mm256_setzero_ps();
+    __m256 zi = _mm256_setzero_ps();
+    __m256 vals = _mm256_setzero_ps();
+    for (int i = 0; i < ITERATIONS; i++) {
+      z = _mm256_add_ps(_mm256_add_ps(_mm256_mul_ps(z, z), _mm256_mul_ps(zi, zi)), x);
+      zi = _mm256_add_ps(_mm256_mul_ps(_mm256_mul_ps(_mm256_set1_ps(2.0f), z), zi), y);
+      __m256 finished = _mm256_cmp_ps(_mm256_add_ps(_mm256_mul_ps(z, z), _mm256_mul_ps(zi, zi)), four, _CMP_LT_OS);
+      vals = _mm256_blendv_ps(_mm256_add_ps(vals, one), vals, finished);
+      if (_mm256_testc_ps(_mm256_cmp_ps(vals, vals, _CMP_EQ_UQ), finished) != 0)
+        break;
+    }
+    _mm256_store_ps(&results[ix + (iy * RESOLUTION)], vals);
+  }
+}</code></pre>
       </div>
     </div>
   </div>
   
-  <div class="blue-grey lighten-2">
+  <div class="blue-grey">
     <div class="container" id="Deliverables">
       <div class="section">
+        <div class="center"><h1>Deliverables</h1></div>
         <div class="row">
-          <div class="col offset-l3 l6 s12">
-            <div class="center"><h4>Deliverables</h4></div>
-            <h5>A Correctness Test Bench</h5>
-            I will implement a test suite that will check for the correctness of all configurations for the implemented classes and functions.
-            <h5>A Performance Test Bench</h5>
-            I will create a performance test that will compare timing of specific aspects of QuickVec against Yeppp! and AVX intrinsics.
-            <h5>An example implementation</h5>
-            I will implement a common algorithm such as a mandelbrot set or marching cubes to demonstrate the ease of use of the interface.
-            <h5>Documentation</h5>
-            I will document all classes and features as well as provide example code for common tasks.
-            <h5>Presentation</h5>
-            My final presentation will include results of the performance comparison, sample snippets of code, and an a demo of the example application.
+          <div class="col l4 s12">
+            <div class="card-panel blue-grey darken-3">
+              <h5>A Correctness Test Bench</h5>
+              I will implement a test suite that will check for the correctness of all configurations for the implemented classes and functions.
+            </div>
+          </div>
+          <div class="col l4 s12">
+            <div class="card-panel blue-grey darken-3">
+              <h5>A Performance Test Bench</h5>
+              I will create a performance test that will compare timing of specific aspects of QuickVec against Yeppp! and AVX intrinsics.
+            </div>
+          </div>
+          <div class="col l4 s12">          
+            <div class="card-panel blue-grey darken-3">
+              <h5>An example implementation</h5>
+              I will implement a common algorithm such as a mandelbrot set or marching cubes to demonstrate the ease of use of the interface.
+            </div>
+          </div>
+          <div class="col l4 s12">
+            <div class="card-panel blue-grey darken-3">
+              <h5>Documentation</h5>
+              I will document all classes and features as well as provide example code for common tasks.
+            </div>
+          </div>
+          <div class="col l4 s12">
+            <div class="card-panel blue-grey darken-3">
+              <h5>Presentation</h5>
+              My final presentation will include results of the performance comparison, sample snippets of code, and an a demo of the example application.
+            </div>
           </div>
         </div>
       </div>
@@ -392,6 +468,7 @@
 
   <!--  Scripts-->
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/prism.js"></script>
   <script src="js/materialize.js"></script>
   <script src="js/init.js"></script>
   <script>
