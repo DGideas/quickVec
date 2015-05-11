@@ -16,15 +16,15 @@ namespace QuickVecTest
 			Op<fp> op;
 			Op<float> op2;
 			fp f1((static_cast<float>(I) + 1)...);
-			fp f2((static_cast<float>(I) + fp::Size)...);
+			fp f2((static_cast<float>(I) + fp::size)...);
 			fp f3 = op(f1, f2);
-			for (int i = 0; i < fp::Size; i++) {
+			for (int i = 0; i < fp::size; i++) {
 				Assert::AreEqual(op2(f1[i], f2[i]), f3[i]);
 			}
 
 		}
 
-		template<class fp, template <typename> class Op, typename Indices = std::make_index_sequence<fp::Size>::type>
+		template<class fp, template <typename> class Op, typename Indices = std::make_index_sequence<fp::size>::type>
 		void testOp() {
 			testOpImpl<fp, Op>(Indices());
 		}
@@ -35,13 +35,13 @@ namespace QuickVecTest
 			static void test(A op, B opDest) {
 				fp f1;
 				fp f2;
-				for (size_t i = 0; i < fp::Size; i++) {
+				for (size_t i = 0; i < fp::size; i++) {
 					f1[i] = static_cast<float>(i);
-					f2[i] = static_cast<float>(i + fp::Size);
+					f2[i] = static_cast<float>(i + fp::size);
 				}
 				fp f3 = op(f1, f2);
 				opDest(f1, f2);
-				for (int i = 0; i < fp::Size; i++) {
+				for (int i = 0; i < fp::size; i++) {
 					// Test for bitwise equality using uint32_t. Otherwise fail on NAN with float.
 					Assert::AreEqual(reinterpret_cast<const uint32_t&>(f1[i]), reinterpret_cast<const uint32_t&>(f3[i]));
 				}

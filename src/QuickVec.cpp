@@ -2,8 +2,25 @@
 #include <iostream>
 #include <chrono>
 #include <memory>
+#include <iomanip>
 
 #include "QuickVec.hpp"
+#include "float8.hpp"
+//#include "numeric_vec.hpp"
+//#include "bool_vec.hpp"
+//#include "float_vec.hpp"
+///////////////////////////////////////////////
+
+#if defined(__arm__) || \
+	defined(__TARGET_ARCH_ARM) || \
+	defined(_ARM) || \
+	defined(_M_ARM) || \
+	defined(__arm)
+#define ARM_MODE
+#endif
+
+
+
 
 using time_point = std::chrono::time_point<std::chrono::system_clock>;
 using time_diff = std::chrono::duration<double>;
@@ -20,15 +37,15 @@ void doMandelbrotFloat(float* results) {
 				float x = static_cast<float>(ix) * oneOverRes;
 				float z = 0.0f;
 				float zi = 0.0f;
-				bool finished = false;
 				int i;
 				for (i = 0; i < ITERATIONS; i++) {
-					z = (z*z) + (zi*zi) + x;
-					zi = 2.0f*z*zi + y;
-					if (((z*z) + (zi*zi)) < 4.0f) {
-						finished = true;
+					float a = z*z;
+					float b = zi*zi;
+					if (a + b > 4.0f) {
 						break;
 					}
+					zi = (2.0f*z*zi) + y;
+					z = a - b + x;
 				}
 				//Record values
 				results[ix + (iy * RESOLUTION)] = i;
@@ -45,7 +62,7 @@ void doMandelbrotVector(float* results) {
 	auto start = my_clock::now();
 	for (int I = 0; I < 100; I++) {
 		float incr[] = {0, 1, 2, 3, 4, 5, 6, 7};
-		float_vec increment(incr);
+		float_vec increment = float_vec::load(incr);
 		float_vec one = 1.0f;
 		float_vec four = 4.0f;
 		float_vec oneOverRes = 1.0f / RESOLUTION;
@@ -54,13 +71,16 @@ void doMandelbrotVector(float* results) {
 			for (int ix = 0; ix < RESOLUTION; ix += float_vec::size) {
 				float_vec x = (increment + ix) * oneOverRes;
 				float_vec z, zi, vals;
+				z = zi = vals = float_vec::zero();
 				for (int i = 0; i < ITERATIONS; i++) {
-					z = (z*z) + (zi*zi) + x;
-					zi = 2.0f*z*zi + y;
-					float_vec::bool_t finished = (((z*z) + (zi*zi)) < four);
-					vals.if_not_set(finished, vals + one);
+					float_vec a = z*z;
+					float_vec b = zi*zi;
+					float_vec::bool_t finished = ((a+b) > four);
 					if (finished.all())
 						break;
+					vals.if_not_set(finished, vals + one);
+					zi = 2.0f*z*zi + y;
+					z = a - b + x;
 				}
 				//Record values
 				vals.store(&results[ix + (iy * RESOLUTION)]);
@@ -89,15 +109,17 @@ void doMandelbrotIntrinsics(float* results) {
 				__m256 zi = _mm256_setzero_ps();
 				__m256 vals = _mm256_setzero_ps();
 				for (int i = 0; i < ITERATIONS; i++) {
-					z = _mm256_add_ps(_mm256_add_ps(_mm256_mul_ps(z, z), _mm256_mul_ps(zi, zi)), x);
-					zi = _mm256_add_ps(_mm256_mul_ps(_mm256_mul_ps(_mm256_set1_ps(2.0f), z), zi), y);
-					__m256 finished = _mm256_cmp_ps(_mm256_add_ps(_mm256_mul_ps(z, z), _mm256_mul_ps(zi, zi)), four, _CMP_LT_OS);
-					vals = _mm256_blendv_ps(_mm256_add_ps(vals, one), vals, finished);
-					if (_mm256_testc_ps(_mm256_cmp_ps(vals, vals, _CMP_EQ_UQ), finished) != 0)
+					__m256 finished = _mm256_cmp_ps(_mm256_add_ps(_mm256_mul_ps(z, z), _mm256_mul_ps(zi, zi)), four, _CMP_GT_OQ);
+					if (_mm256_testc_ps(_mm256_cmp_ps(vals, vals, _CMP_EQ_UQ), finished) == 0)
 						break;
+					vals = _mm256_blendv_ps(_mm256_add_ps(vals, one), vals, finished);
+					__m256 a = _mm256_mul_ps(z, z);
+					__m256 b = _mm256_mul_ps(zi, zi);
+					zi = _mm256_add_ps(_mm256_mul_ps(_mm256_mul_ps(_mm256_set1_ps(2.0f), z), zi), y);
+					z = _mm256_add_ps(_mm256_sub_ps(a, b), x);
 				}
 				//Record values
-				_mm256_store_ps(&results[ix + (iy * RESOLUTION)], vals);
+				_mm256_storeu_ps(&results[ix + (iy * RESOLUTION)], vals);
 			}
 		}
 	}
@@ -105,6 +127,24 @@ void doMandelbrotIntrinsics(float* results) {
 	time_diff duration = end - start;
 	std::cout << "Mandelbrot took " << duration.count() << "s\n";
 }
+/*
+enum InstructionSupport{
+#ifndef ARM
+	None,
+	SSE,
+	SSE2,
+	SSE3,
+	SSE4_1,
+	SSE4_2,
+	AVX,
+	AVX2,
+	AVX_512
+}
+
+doMandelbrotSelect(int support) {
+	switch support
+
+}*/
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -129,7 +169,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		using fp = QuickVec::float4_sse;
 		fp f(1, 2, 3, 4);
-		fp v = 0;
+		fp v = 0.0f;
 		auto start = clock::now();
 		for (int i = 0; i < 1000000; i++) {
 			v += f;
@@ -213,8 +253,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	// Mandelbrot
-	static const size_t RESOLUTION = 1024*2;
-	static const size_t ITERATIONS = 100;
+	static const size_t RESOLUTION = 32;
+	static const size_t ITERATIONS = 50;
 	std::unique_ptr<float[]> resultSeq = std::unique_ptr<float[]>(new float[RESOLUTION*RESOLUTION]);
 	std::unique_ptr<float[]> resultVec = std::unique_ptr<float[]>(new float[RESOLUTION*RESOLUTION]);
 	std::unique_ptr<float[]> resultInt = std::unique_ptr<float[]>(new float[RESOLUTION*RESOLUTION]);
@@ -225,15 +265,32 @@ int _tmain(int argc, _TCHAR* argv[])
 	for (size_t y = 0; y < RESOLUTION; y++) {
 		for (size_t x = 0; x < RESOLUTION; x++) {
 			size_t index = x + RESOLUTION*y;
-			if (resultSeq[index] != resultVec[index]) {
-				std::cout << "Mismatch at " << x << "," << y << " values were " << resultSeq[index] << " and " << resultInt[index] << std::endl;
+			if (resultVec[index] != resultInt[index]) {
+				std::cout << "Mismatch at " << x << "," << y << " values were " << resultSeq[index] << " and " << resultVec[index] << std::endl;
 				mismatched = true;
 				break;
 			}
+			//std::cout << resultSeq[index];
 		}
+		//std::cout << std::endl;
 		if (mismatched) break;
 	}
-
+	std::cout << std::endl;
+	for (size_t y = 0; y < RESOLUTION; y++) {
+		for (size_t x = 0; x < RESOLUTION; x++) {
+			size_t index = x + RESOLUTION*y;
+			std::cout << std::setfill('0') << std::setw(2) << resultSeq[index] << " ";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+	for (size_t y = 0; y < RESOLUTION; y++) {
+		for (size_t x = 0; x < RESOLUTION; x++) {
+			size_t index = x + RESOLUTION*y;
+			std::cout << std::setfill('0') << std::setw(2) << resultVec[index] << " ";
+		}
+		std::cout << std::endl;
+	}
 
 	std::cin.ignore();
 

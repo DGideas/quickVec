@@ -64,7 +64,8 @@ namespace QuickVec {
 	// bool_t operator||(const bool_t& a, const bool_t& b);
 	// bool_t operator&&(const bool_t& b, const bool_t& b);
 
-	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// bool avx file
 	using bool8_avx = bool_vec<__m256, 8>;
 
@@ -84,7 +85,7 @@ namespace QuickVec {
 	// bool8_avx any/all operators
 	/////////////////////////////////////////////////////////////
 	inline bool bool8_avx::all() const {
-		return (_mm256_testc_ps(bool_t(true), raw) != 0);
+		return (_mm256_testc_ps(bool_t(true), raw) == 0);
 	}
 
 	inline bool bool8_avx::any() const {
@@ -119,13 +120,13 @@ namespace QuickVec {
 		return bool8_avx(_mm256_and_ps(a.raw, b.raw));
 	}
 
-	template<typename data_t, typename bool_t_, size_t size_>
-	class alignas(data_t) float_vec
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// float vec file
+	template<typename T, typename data_t, typename bool_t_, size_t size_>
+	class alignas(data_t) numeric_vec
 	{
-		using vec_t = float_vec<data_t, bool_t_, size_>;
-		// Only implicitly convert to and from raw in private
-		vec_t(const data_t& o) : raw(o) {};
-		operator data_t () const { return raw; }
+		using vec_t = numeric_vec<T, data_t, bool_t_, size_>;
 	public:
 		using bool_t = bool_t_;
 		static const size_t size = size_;
@@ -134,16 +135,19 @@ namespace QuickVec {
 		vec_t(vec_t&& o) = default;
 		vec_t(const vec_t& o) = default;
 		vec_t& operator=(const vec_t& o) = default;
-			
-		vec_t(float o);
-		vec_t(const float* ptr, bool aligned = false) {
+		explicit vec_t(const data_t& o) : raw(o) {};
+
+		vec_t(T o);
+		vec_t(const T* ptr, bool aligned = false) {
 			if (aligned) {
-				raw = loadAligned(ptr);
+				raw = loadAligned(ptr).raw;
 			}
 			else {
-				raw = load(ptr);
+				raw = load(ptr).raw;
 			}
 		}
+
+		static vec_t zero();
 
 		static vec_t loadAligned(const float* ptr);
 		static vec_t load(const float* ptr);
@@ -154,35 +158,38 @@ namespace QuickVec {
 		vec_t& if_set(const bool_t& mask, const vec_t& newVal);
 		vec_t& if_not_set(const bool_t& mask, const vec_t& newVal);
 
-		friend vec_t operator+(const vec_t& a, const vec_t& b);
-		friend vec_t operator-(const vec_t& a, const vec_t& b);
-		friend vec_t operator*(const vec_t& a, const vec_t& b);
-		friend vec_t operator/(const vec_t& a, const vec_t& b);
-
 		vec_t& operator+=(const vec_t& o) { raw = *this + o; return *this; }
 		vec_t& operator-=(const vec_t& o) { raw = *this - o; return *this; }
 		vec_t& operator*=(const vec_t& o) { raw = *this * o; return *this; }
 		vec_t& operator/=(const vec_t& o) { raw = *this / o; return *this; }
 	};
 
-	////////////////////////////////////////////////////////////////
-	// float8 avx specific
+	template<typename data_t, typename bool_t, size_t size>
+	using float_vec = numeric_vec<float, data_t, bool_t, size>;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// float8_avx file
 	using float8_avx = float_vec<__m256, bool8_avx, 8>;
 
-	inline float8_avx::float_vec() {
+	inline float8_avx::numeric_vec() {
 		raw = _mm256_setzero_ps();
 	}
 
-	inline float8_avx::float_vec(float o) {
+	inline float8_avx::numeric_vec(float o) {
 		raw = _mm256_set1_ps(o);
 	}
 
+	inline float8_avx float8_avx::zero() {
+		return float8_avx(_mm256_setzero_ps());
+	}
+
 	inline float8_avx float8_avx::loadAligned(const float* ptr) {
-		return _mm256_load_ps(ptr);
+		return float8_avx(_mm256_load_ps(ptr));
 	}
 
 	inline float8_avx float8_avx::load(const float* ptr) {
-		return _mm256_loadu_ps(ptr);
+		return float8_avx(_mm256_loadu_ps(ptr));
 	}
 
 	inline void float8_avx::store(float* ptr) {
@@ -193,13 +200,13 @@ namespace QuickVec {
 		_mm256_storeu_ps(ptr, raw);
 	}
 
-	float8_avx& float8_avx::if_set(const float8_avx::bool_t& mask, const float8_avx& newVal) {
-		raw = _mm256_blendv_ps(raw, newVal, mask.raw);
+	inline float8_avx& float8_avx::if_set(const float8_avx::bool_t& mask, const float8_avx& newVal) {
+		raw = _mm256_blendv_ps(raw, newVal.raw, mask.raw);
 		return *this;
 	}
 
-	float8_avx& float8_avx::if_not_set(const float8_avx::bool_t& mask, const float8_avx& newVal) {
-		raw = _mm256_blendv_ps(newVal, raw, mask.raw);
+	inline float8_avx& float8_avx::if_not_set(const float8_avx::bool_t& mask, const float8_avx& newVal) {
+		raw = _mm256_blendv_ps(newVal.raw, raw, mask.raw);
 		return *this;
 	}
 
@@ -207,19 +214,19 @@ namespace QuickVec {
 	// float8 arithmetic operators
 	/////////////////////////////////////////////////////////////
 	inline float8_avx operator+(const float8_avx& a, const float8_avx& b) {
-		return _mm256_add_ps(a, b);
+		return float8_avx(_mm256_add_ps(a.raw, b.raw));
 	}
 
 	inline float8_avx operator-(const float8_avx& a, const float8_avx& b) {
-		return _mm256_sub_ps(a, b);
+		return float8_avx(_mm256_sub_ps(a.raw, b.raw));
 	}
 
 	inline float8_avx operator*(const float8_avx& a, const float8_avx& b) {
-		return _mm256_mul_ps(a, b);
+		return float8_avx(_mm256_mul_ps(a.raw, b.raw));
 	}
 
 	inline float8_avx operator/(const float8_avx& a, const float8_avx& b) {
-		return _mm256_div_ps(a, b);
+		return float8_avx(_mm256_div_ps(a.raw, b.raw));
 	}
 
 	/////////////////////////////////////////////////////////////
