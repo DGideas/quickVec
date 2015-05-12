@@ -5,5 +5,6 @@
 #include "int4_sse.hpp"
 #include "float_base.hpp"
 #include "float4.hpp"
-#include "float8.hpp"
+//#include "float8.hpp"
+#include "float8_avx.hpp"
 #include "functional.hpp"

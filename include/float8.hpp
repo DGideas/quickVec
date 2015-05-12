@@ -1,5 +1,7 @@
 #pragma once
 
+#error "DONT USE THIS"
+
 #include <xmmintrin.h>
 #include "float_base.hpp"
 
@@ -135,7 +137,11 @@ namespace QuickVec {
 		vec_t(vec_t&& o) = default;
 		vec_t(const vec_t& o) = default;
 		vec_t& operator=(const vec_t& o) = default;
+		vec_t& operator=(vec_t&& o) = default;
 		explicit vec_t(const data_t& o) : raw(o) {};
+
+		template<typename... Args, typename Enable = std::enable_if<size - 1 == sizeof...(Args)>::type >
+		vec_t(const T& a, const Args&... args) : raw({ a, static_cast<T>(args)... }) {};
 
 		vec_t(T o);
 		vec_t(const T* ptr, bool aligned = false) {
@@ -158,10 +164,13 @@ namespace QuickVec {
 		vec_t& if_set(const bool_t& mask, const vec_t& newVal);
 		vec_t& if_not_set(const bool_t& mask, const vec_t& newVal);
 
-		vec_t& operator+=(const vec_t& o) { raw = *this + o; return *this; }
-		vec_t& operator-=(const vec_t& o) { raw = *this - o; return *this; }
-		vec_t& operator*=(const vec_t& o) { raw = *this * o; return *this; }
-		vec_t& operator/=(const vec_t& o) { raw = *this / o; return *this; }
+		T& operator[](size_t i);
+		const T& operator[](size_t i) const;
+
+		vec_t& operator+=(const vec_t& o) { raw = (*this + o).raw; return *this; }
+		vec_t& operator-=(const vec_t& o) { raw = (*this - o).raw; return *this; }
+		vec_t& operator*=(const vec_t& o) { raw = (*this * o).raw; return *this; }
+		vec_t& operator/=(const vec_t& o) { raw = (*this / o).raw; return *this; }
 	};
 
 	template<typename data_t, typename bool_t, size_t size>
@@ -210,6 +219,14 @@ namespace QuickVec {
 		return *this;
 	}
 
+	inline const float& float8_avx::operator[](size_t i) const {
+		return raw.m256_f32[i];
+	}
+
+	inline float& float8_avx::operator[](size_t i) {
+		return raw.m256_f32[i];
+	}
+
 	/////////////////////////////////////////////////////////////
 	// float8 arithmetic operators
 	/////////////////////////////////////////////////////////////
@@ -227,6 +244,10 @@ namespace QuickVec {
 
 	inline float8_avx operator/(const float8_avx& a, const float8_avx& b) {
 		return float8_avx(_mm256_div_ps(a.raw, b.raw));
+	}
+
+	inline float8_avx operator-(const float8_avx& a) {
+		return float8_avx(_mm256_sub_ps(_mm256_setzero_ps(), a.raw));
 	}
 
 	/////////////////////////////////////////////////////////////

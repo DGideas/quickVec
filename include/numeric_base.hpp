@@ -21,6 +21,7 @@ namespace QuickVec {
 		using Data_t = data_t;
 		Data_t data;
 	public:
+		static const size_t size = N;
 		this_t() {
 			for (int i = 0; i < N; i++) {
 				data[i] = 0;
@@ -46,9 +47,33 @@ namespace QuickVec {
 			return true;
 		}
 
+		bool any() const {
+			for (int i = 0; i < N; i++) {
+				if (data[i]) return true;
+			}
+			return false;
+		}
+
 		//[]
 		T& operator[](size_t i) { return data[i]; }
 		T operator[](size_t i) const { return data[i]; }
+
+		this_t operator&&(const this_t& o) const {
+			this_t ret;
+			for (int i = 0; i < size; i++) {
+				ret.data[i] &= o.data[i];
+			}
+			return ret;
+		}
+		this_t operator||(const this_t& o) const {
+			this_t ret;
+			for (int i = 0; i < size; i++) {
+				ret.data[i] |= o.data[i];
+			}
+			return ret;
+		}
+		this_t& operator&=(const this_t& o) { data = (*this && o).data; return *this; }
+		this_t& operator|=(const this_t& o) { data = (*this || o).data; return *this; }
 	};
 
 	template<typename T, size_t N, typename data_t = std::array<T,N> >

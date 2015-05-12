@@ -9,44 +9,46 @@ using namespace QuickVec;
 
 namespace QuickVecTest
 {
+	template<class fp, template <typename> class Op, size_t...I>
+	void testOpImpl(std::index_sequence<I...>) {
+		Op<fp> op;
+		Op<float> op2;
+		fp f1((static_cast<float>(I) + 1)...);
+		fp f2((static_cast<float>(I) + fp::size)...);
+		fp f3 = op(f1, f2);
+		for (int i = 0; i < fp::size; i++) {
+			Assert::AreEqual(op2(f1[i], f2[i]), f3[i]);
+		}
+
+	}
+
+	template<class fp, template <typename> class Op, typename Indices = std::make_index_sequence<fp::size>::type>
+	void testOp() {
+		testOpImpl<fp, Op>(Indices());
+	}
+
+	template <typename fp>
+	struct TestDestOp {
+		template<typename A, typename B>
+		static void test(A op, B opDest) {
+			fp f1;
+			fp f2;
+			for (size_t i = 0; i < fp::size; i++) {
+				f1[i] = static_cast<float>(i);
+				f2[i] = static_cast<float>(i + fp::size);
+			}
+			fp f3 = op(f1, f2);
+			opDest(f1, f2);
+			for (int i = 0; i < fp::size; i++) {
+				// Test for bitwise equality using uint32_t. Otherwise fail on NAN with float.
+				Assert::AreEqual(reinterpret_cast<const uint32_t&>(f1[i]), reinterpret_cast<const uint32_t&>(f3[i]));
+			}
+		}
+	};
+
+	
 	TEST_CLASS(Float4Test)
 	{
-		template<class fp, template <typename> class Op, size_t...I>
-		void testOpImpl(std::index_sequence<I...>) {
-			Op<fp> op;
-			Op<float> op2;
-			fp f1((static_cast<float>(I) + 1)...);
-			fp f2((static_cast<float>(I) + fp::size)...);
-			fp f3 = op(f1, f2);
-			for (int i = 0; i < fp::size; i++) {
-				Assert::AreEqual(op2(f1[i], f2[i]), f3[i]);
-			}
-
-		}
-
-		template<class fp, template <typename> class Op, typename Indices = std::make_index_sequence<fp::size>::type>
-		void testOp() {
-			testOpImpl<fp, Op>(Indices());
-		}
-
-		template <typename fp>
-		struct TestDestOp {
-			template<typename A, typename B>
-			static void test(A op, B opDest) {
-				fp f1;
-				fp f2;
-				for (size_t i = 0; i < fp::size; i++) {
-					f1[i] = static_cast<float>(i);
-					f2[i] = static_cast<float>(i + fp::size);
-				}
-				fp f3 = op(f1, f2);
-				opDest(f1, f2);
-				for (int i = 0; i < fp::size; i++) {
-					// Test for bitwise equality using uint32_t. Otherwise fail on NAN with float.
-					Assert::AreEqual(reinterpret_cast<const uint32_t&>(f1[i]), reinterpret_cast<const uint32_t&>(f3[i]));
-				}
-			}
-		};
 	public:
 		template<typename fp>
 		void testConstruct() {
@@ -188,6 +190,150 @@ namespace QuickVecTest
 			testUnaryOps<float4_sse>();
 			testUnaryOps<float4_sse2>();
 			testUnaryOps<float4_sse4_1>();
+		}
+	};
+
+	TEST_CLASS(Float8Test) {
+	public:
+		template<typename fp>
+		void testConstruct() {
+			//construct order check
+			fp a(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f);
+			Assert::AreEqual(1.0f, a[0]);
+			Assert::AreEqual(2.0f, a[1]);
+			Assert::AreEqual(3.0f, a[2]);
+			Assert::AreEqual(4.0f, a[3]);
+			Assert::AreEqual(5.0f, a[4]);
+			Assert::AreEqual(6.0f, a[5]);
+			Assert::AreEqual(7.0f, a[6]);
+			Assert::AreEqual(8.0f, a[7]);
+			//construct from singular check
+			fp b(2.0f);
+			Assert::AreEqual(2.0f, b[0]);
+			Assert::AreEqual(2.0f, b[1]);
+			Assert::AreEqual(2.0f, b[2]);
+			Assert::AreEqual(2.0f, b[3]);
+			Assert::AreEqual(2.0f, b[4]);
+			Assert::AreEqual(2.0f, b[5]);
+			Assert::AreEqual(2.0f, b[6]);
+			Assert::AreEqual(2.0f, b[7]);
+		}
+
+		TEST_METHOD(TestConstruct)
+		{
+			testConstruct<float_base<8>>();
+			testConstruct<float8_avx>();
+		}
+
+		template<typename fp>
+		void testArithmetic() {
+			testOp<fp, std::plus>();
+			testOp<fp, std::minus>();
+			testOp<fp, std::multiplies>();
+			testOp<fp, std::divides>();
+			testOp<fp, func::modulo>();
+		}
+
+		TEST_METHOD(TestArithmetic1) {
+			testArithmetic<float_base<8>>();
+			testArithmetic<float8_avx>();
+		}
+
+		template < typename A, typename B>
+		void testAVXDestOp(A op, B opDest) {
+			float8_avx f1(1.0f, -2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f);
+			float8_avx f2(2.0f, 3.0f, -4.0f, -5.0f, 6.0f, 8.0f, 9.0f, 10.0f);
+			float8_avx f3 = op(f1, f2);
+			opDest(f1, f2);
+			for (int i = 0; i < 4; i++) {
+				Assert::AreEqual(f1[i], f3[i]);
+			}
+		}
+
+		template< typename fp>
+		void testDestructiveArithmetic() {
+			TestDestOp<fp>::test(func::plus<fp>(), [](fp& a, fp& b) { a += b; });
+			TestDestOp<fp>::test(func::minus<fp>(), [](fp& a, fp& b) { a -= b; });
+			TestDestOp<fp>::test(func::multiply<fp>(), [](fp& a, fp& b) { a *= b; });
+			TestDestOp<fp>::test(func::divide<fp>(), [](fp& a, fp& b) { a /= b; });
+			//TestDestOp<fp>::test(func::modulo<fp>(), [](fp& a, fp& b) { a %= b; });
+		}
+
+		TEST_METHOD(TestDestructiveArithmeticSSE)
+		{
+			testDestructiveArithmetic<float_base<8>>();
+			testDestructiveArithmetic<float8_avx>();
+		}
+
+		template< typename fp>
+		void testSingularOps() {
+			fp a(1, 2, 3, 4, 5, 6, 7, 8);
+			fp b = a;
+			a += 4;
+			Assert::AreEqual(a[0], 5.0f);
+			Assert::AreEqual(a[1], 6.0f);
+			Assert::AreEqual(a[2], 7.0f);
+			Assert::AreEqual(a[3], 8.0f);
+			Assert::AreEqual(a[4], 9.0f);
+			Assert::AreEqual(a[5], 10.0f);
+			Assert::AreEqual(a[6], 11.0f);
+			Assert::AreEqual(a[7], 12.0f);
+			a -= b;
+			Assert::AreEqual(a[0], 4.0f);
+			Assert::AreEqual(a[1], 4.0f);
+			Assert::AreEqual(a[2], 4.0f);
+			Assert::AreEqual(a[3], 4.0f);
+			Assert::AreEqual(a[4], 4.0f);
+			Assert::AreEqual(a[5], 4.0f);
+			Assert::AreEqual(a[6], 4.0f);
+			Assert::AreEqual(a[7], 4.0f);
+			a -= 4;
+			Assert::AreEqual(a[0], 0.0f);
+			Assert::AreEqual(a[1], 0.0f);
+			Assert::AreEqual(a[2], 0.0f);
+			Assert::AreEqual(a[3], 0.0f);
+			Assert::AreEqual(a[4], 0.0f);
+			Assert::AreEqual(a[5], 0.0f);
+			Assert::AreEqual(a[6], 0.0f);
+			Assert::AreEqual(a[7], 0.0f);
+		}
+
+		TEST_METHOD(TestSingularOps) {
+			testSingularOps<float_base<8>>();
+			testSingularOps<float8_avx>();
+		}
+
+		template<typename fp>
+		void testModuloNeg() {
+			fp a(10, -20, 30, -40, 1,1,1,1);
+			fp b(20, 7, -7, -6, 1,1,1,1);
+			fp c = a % b;
+			a %= b;
+			Assert::AreEqual(10.0f, c[0]);
+			Assert::AreEqual(1.0f, c[1]);
+			Assert::AreEqual(2.0f, c[2]);
+			Assert::AreEqual(2.0f, c[3]);
+			Assert::AreEqual(0.0f, c[4]);
+			Assert::AreEqual(0.0f, c[5]);
+			Assert::AreEqual(0.0f, c[6]);
+			Assert::AreEqual(0.0f, c[7]);
+		}
+
+		TEST_METHOD(TestModuloNeg) {
+			testModuloNeg<float_base<8>>();
+			testModuloNeg<float8_avx>();
+		}
+
+		template<typename fp>
+		void testUnaryOps() {
+			fp a(0.0f, 1, 2, 3, 4, 5, 6, 7);
+			fp b = -a;
+			for (int i = 0; i < 4; i++) { Assert::AreEqual(-a[i], b[i]); }
+		}
+
+		TEST_METHOD(TestUnaryOps) {
+			testUnaryOps<float_base<8>>();
+			testUnaryOps<float8_avx>();
 		}
 	};
 

@@ -68,6 +68,9 @@ namespace QuickVec {
 		vec_t& operator=(const vec_t& o) = default;
 		explicit vec_t(const data_t& o) : raw(o) {};
 
+		template<typename... Args, typename std::enable_if<N-1 == sizeof...(Args)>::type >
+		vec_t(const T& a, const Args&... args) : raw({ a, static_cast<T>(args)... }) {};
+		
 		vec_t(T o);
 		vec_t(const T* ptr, bool aligned = false) {
 			if (aligned) {

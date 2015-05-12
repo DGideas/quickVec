@@ -33,10 +33,19 @@
     <ClInclude Include="..\..\..\include\numeric_base.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\float8.hpp">
+    <ClInclude Include="..\..\..\include\float4.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\float4.hpp">
+    <ClInclude Include="..\..\..\include\bool_vec.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\numeric_vec.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\float8_avx.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\cpu_support.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

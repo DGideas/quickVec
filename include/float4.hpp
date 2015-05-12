@@ -29,7 +29,7 @@ namespace QuickVec {
 
 		template <typename Enable = std::enable_if<(N>1)>::type>
 		this_t(T&& t) {
-			data = _mm_castepi32_ps(_mm_set1_epi32(t));
+			data = _mm_castsi128_ps(_mm_set1_epi32(t));
 		}
 
 		this_t(Data_t&& d) : data(d) {};
@@ -37,15 +37,20 @@ namespace QuickVec {
 		bool all() const {
 			__m128 junk = _mm_setzero_ps();
 			return (_mm_testc_ps(_mm_cmpeq_ps(junk,junk), data) == 0);
-			/*for (int i = 0; i < N; i++) {
-			if (!data[i]) return false;
-			}
-			return true;*/
+		}
+
+		bool any() const {
+			return (_mm_testz_ps(data, data) == 0);
 		}
 
 		//[]
 		T& operator[](size_t i) { return reinterpret_cast<int&>(data.m128_f32[i]); }
 		T operator[](size_t i) const { return  reinterpret_cast<const int&>(data.m128_f32[i]); }
+
+		this_t operator&&(const this_t& o) const { return this_t(_mm_and_ps(data, o.data)); }
+		this_t operator||(const this_t& o) const { return this_t(_mm_or_ps(data, o.data)); }
+		this_t& operator&=(const this_t& o) { data = (*this && o).data; return *this; }
+		this_t& operator|=(const this_t& o) { data = (*this || o).data; return *this; }
 	};
 
 	class alignas(__m128) float4_sse : public float_base<4, m128_float> {
@@ -63,9 +68,7 @@ namespace QuickVec {
 	public:
 		using bool_t = bool4_sse;
 
-		this_t() {
-			_mm_setzero_ps();
-		};
+		this_t() = default;
 
 		this_t(const base_t& o) : base_t(o) {};
 
@@ -128,16 +131,14 @@ namespace QuickVec {
 
 		//Binary ops
 		//+ - * / % | & ^ >> <<
-		this_t& operator+=(const this_t& o) { data = _mm_add_ps(data, o.data); return *this; }
+		this_t& operator+=(const this_t& o) { data = (*this + o).data; return *this; }
+		this_t& operator-=(const this_t& o) { data = (*this - o).data; return *this; }
+		this_t& operator*=(const this_t& o) { data = (*this * o).data; return *this; }
+		this_t& operator/=(const this_t& o) { data = (*this / o).data; return *this; }
+
 		this_t operator+(const this_t& o) const { return _mm_add_ps(data, o.data); }
-
-		this_t& operator-=(const this_t& o) { data = _mm_sub_ps(data, o.data); return *this; }
 		this_t operator-(const this_t& o) const { return _mm_sub_ps(data, o.data); }
-
-		this_t& operator*=(const this_t& o) { data = _mm_mul_ps(data, o.data); return *this; }
 		this_t operator*(const this_t& o) const { return _mm_mul_ps(data, o.data); }
-
-		this_t& operator/=(const this_t& o) { data = _mm_div_ps(data, o.data); return *this; }
 		this_t operator/(const this_t& o) const { return _mm_div_ps(data, o.data); }
 
 		//this_t& operator%=(const this_t& o) { }
@@ -165,6 +166,22 @@ namespace QuickVec {
 
 		//[]
 	};
+
+	inline float4_sse operator+(const float& a, const float4_sse& b) {
+		return b + a;
+	}
+
+	inline float4_sse operator-(const float& a, const float4_sse& b) {
+		return float4_sse(a) - b;
+	}
+
+	inline float4_sse operator*(const float& a, const float4_sse& b) {
+		return b + a;
+	}
+
+	inline float4_sse operator/(const float& a, const float4_sse& b) {
+		return float4_sse(a) / b;
+	}
 
 	class float4_sse2 : public float4_sse {
 	protected:
