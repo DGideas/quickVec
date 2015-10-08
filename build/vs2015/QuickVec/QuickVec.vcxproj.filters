@@ -48,6 +48,9 @@
     <ClInclude Include="..\..\..\include\cpu_support.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\func_prop.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\QuickVec.cpp">

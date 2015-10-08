@@ -216,6 +216,7 @@
     <ClInclude Include="..\..\..\include\float8_avx.hpp" />
     <ClInclude Include="..\..\..\include\float_base.hpp" />
     <ClInclude Include="..\..\..\include\functional.hpp" />
+    <ClInclude Include="..\..\..\include\func_prop.hpp" />
     <ClInclude Include="..\..\..\include\int4_sse.hpp" />
     <ClInclude Include="..\..\..\include\int_base.hpp" />
     <ClInclude Include="..\..\..\include\numeric_base.hpp" />
